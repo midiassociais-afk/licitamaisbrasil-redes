@@ -31,13 +31,32 @@ Grave com ArtifactData `batch` (até 50 escritas). Documentos novos não levam i
 3. ArtifactData `query` em `itens` com where dia >= (hoje − 45 dias), limit 1000. Monte a lista de chaves usadas, incluindo todas as `chavesExtras`. Nunca repita uma chave.
 Redes: Instagram, Facebook, LinkedIn, YouTube e X. Inclua "X" em formatos de todo item de jurisprudência, notícia, legislação, novidade, institucional e no carrossel de oportunidades.
 
-## Passo 1 — Jurisprudência do TCU
+## Passo 1 — TCU
+O Boletim de Jurisprudência sai às segundas, no fim da tarde, e o Informativo de Licitações e Contratos sai a cada 15 dias, às terças. Por isso:
+- **Terça:** faça o Passo 1A (Boletim) e o 1B (Informativo).
+- **Quarta:** faça só o 1B, caso o Informativo desta semana não tenha saído a tempo na terça.
+- **Todos os dias:** faça o 1C (notícias do TCU).
+- **Quinta ("Você sabia?"):** se faltar assunto, use o 1D.
+Fora desses dias, não consulte o Boletim nem o Informativo.
+
+### 1A — Boletim de Jurisprudência (terças)
 1. WebFetch em https://portal.tcu.gov.br/jurisprudencia/inicio/ pedindo número, data e links (PDF e Word) dos 3 Boletins de Jurisprudência mais recentes.
 2. Se a chave `bj-<número>` do mais recente não foi usada: `node automacao/coleta.mjs boletim "<LINK WORD>" /tmp/lmb/bj.txt` e leia /tmp/lmb/bj.txt.
 3. Cada enunciado começa com "Acórdão NNNN/AAAA Colegiado (tipo, Relator …)", seguido da linha de tema e do enunciado. Selecione os de Licitação, Contrato administrativo, Pregão, Dispensa, Credenciamento, Registro de preços, Sobrepreço, Habilitação, Pesquisa de preços ou Lei 14.133/2021.
 4. Crie 1 item `jurisprudencia`, `chave:"bj-<n>"`, formatos ["Vídeo YouTube","Reels","X"]: roteiro do vídeo semanal com os 2–4 enunciados mais úteis (abertura; para cada acórdão: o que aconteceu, o que o TCU entendeu, o que muda na prática; encerramento com CTA; 2–3 min).
 5. Até 2 itens extras, um por enunciado de maior impacto, formatos ["Carrossel","LinkedIn","X"], `chave:"acordao-<num>-<ano>-<colegiado>"`.
 6. Fontes: a página do portal e o link do documento. Copie número de acórdão e colegiado exatamente como estão; nunca invente números. Sem boletim novo, nenhum item de jurisprudência. Se o boletim não tiver enunciado de licitação, diga isso no resumo da pauta.
+
+### 1B — Informativo de Licitações e Contratos (terças; quarta se não saiu)
+1. WebFetch em https://portal.tcu.gov.br/jurisprudencia/inicio/ (ou na página de boletins e informativos indicada nela) pedindo número, data e link da edição mais recente do Informativo de Licitações e Contratos.
+2. Se a chave `ilc-<número>` não foi usada, abra o documento (versão Word com `node automacao/coleta.mjs boletim "<LINK WORD>" /tmp/lmb/ilc.txt`, que serve para qualquer .docx do TCU; ou WebFetch, se só houver página web).
+3. Todo o Informativo trata de licitações e contratos: escolha os 2 ou 3 enunciados de maior impacto prático e crie 1 carrossel `jurisprudencia`, `chave:"ilc-<n>"`, formatos ["Carrossel","LinkedIn","X"], com uma tela por enunciado (acórdão, o que o TCU entendeu, o que muda na prática). Mesmas regras de fidelidade do 1A.
+
+### 1C — Notícias do TCU (todos os dias)
+WebFetch em https://portal.tcu.gov.br/imprensa/noticias pedindo as notícias dos últimos 2 dias. Só aproveite as que tratam de licitações, contratações públicas, pregão, obras, PNCP, plataformas eletrônicas ou fiscalização de compras. Crie no máximo 1 item `noticia`, `chave:"tcu-noticia-<slug>"`, com o link da notícia como fonte. Se nada servir, não crie item.
+
+### 1D — Jurisprudência Selecionada e Súmulas (reserva para quinta)
+Se a quinta não tiver um bom "Você sabia?", use https://pesquisa.apps.tcu.gov.br/pesquisa/jurisprudencia-selecionada ou https://pesquisa.apps.tcu.gov.br/pesquisa/sumula (WebFetch) para escolher um entendimento consolidado sobre licitações. Crie 1 carrossel `legislacao`, `chave:"tcu-js-<slug>"`, citando o número do enunciado ou da súmula exatamente como aparece. Não repita chaves dos últimos 45 dias.
 
 ## Passo 2 — Oportunidades da plataforma
 `node automacao/coleta.mjs oportunidades > /tmp/lmb/oport.json` (já traz modalidade traduzida, abertura em Brasília e link; a janela é de 30 h, ou 72 h às segundas).
@@ -57,8 +76,8 @@ Não mostre valores (a lista não traz o valor estimado). Se o comando falhar, r
 WebSearch (modo standard) sobre as últimas 48 h, por exemplo: "licitações notícia", "Lei 14.133 novidade", "PNCP", "Seges MGI instrução normativa contratações", "TCU licitação acórdão", "Diário Oficial decreto licitações". Abra as fontes promissoras com WebFetch e priorize órgãos oficiais (gov.br, planalto.gov.br, tcu.gov.br, in.gov.br, pncp.gov.br, TCEs). Escolha até 3 assuntos novos e úteis: `noticia` (fato) ou `legislacao` (norma nova), `chave:"noticia-<slug>"`, com fonte oficial. Descarte boatos, opinião e assuntos sem fonte oficial.
 
 ## Passo 5 — Dica perene
-Se não houver item `legislacao` hoje, crie 1 carrossel de dica prática sobre a Lei 14.133/2021 ou o PNCP, ligado ao momento do ano (PCA, fim do exercício, adesão a ata, credenciamento), `chave:"dica-<slug>"` não usada em 45 dias. Confirme o artigo abrindo https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14133.htm com WebFetch (o site do Planalto recusa curl a partir da nuvem) e coloque esse link nas fontes.
-Calendário: segunda = jurisprudência; terça = legislação e dicas; quarta = novidade da plataforma; quinta = "Você sabia?"; sexta = resumo da semana. A linha do dia recebe prioridade 5. Na sexta, crie também 1 item `noticia`, `chave:"resumo-<dia>"`, formatos ["Carrossel","LinkedIn","X"], com 3–5 destaques da semana.
+De segunda a sexta, se não houver item `legislacao` hoje, crie 1 carrossel de dica prática sobre a Lei 14.133/2021 ou o PNCP, ligado ao momento do ano (PCA, fim do exercício, adesão a ata, credenciamento), `chave:"dica-<slug>"` não usada em 45 dias. Confirme o artigo abrindo https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14133.htm com WebFetch (o site do Planalto recusa curl a partir da nuvem) e coloque esse link nas fontes.
+Calendário: segunda = legislação e dicas; terça = jurisprudência do TCU (Boletim e, nas semanas em que sai, o Informativo); quarta = novidade da plataforma; quinta = "Você sabia?"; sexta = resumo da semana. Sábado e domingo: só oportunidades, notícias do TCU e ajustes. A linha do dia recebe prioridade 5. Na sexta, crie também 1 item `noticia`, `chave:"resumo-<dia>"`, formatos ["Carrossel","LinkedIn","X"], com 3–5 destaques da semana.
 
 ## Passo 6 — Ajustes pedidos pela equipe
 Query em `itens` com where status == "ajustar". Para cada item com `comentario` não vazio: reescreva conforme o pedido, mantendo fontes reais, e faça update com if_version: campos reescritos, status "pendente", comentarioAtendido = comentário original, comentario = "", geradoEm = agora. Se o item tinha `imagens`, refaça as artes no Passo 7. Se não der para atender, mantenha "ajustar" e escreva em comentario "Não foi possível atender: <motivo>".
