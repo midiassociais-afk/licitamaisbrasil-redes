@@ -1,0 +1,367 @@
+<title>Central de Publicações Licita Mais Brasil</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: mesa de aprovação — abas de dia no topo; cada sugestão em duas colunas: texto e decisão à esquerda, prévia por rede à direita */
+:root{
+  --verde:#21B24D;--azul:#03A2E4;--amarelo:#FFC718;--grafite:#28323B;
+  --bg:#F4F6F8;--card:#FFFFFF;--fg:#28323B;--muted:#55636E;--line:#E4E9ED;--accent:#157A35;--accent2:#0270A6;--focus:#0270A6;
+  --ok-bg:#DDF5E4;--ok-fg:#0F6B34;--warn-bg:#FFF1C2;--warn-fg:#6B5200;--bad-bg:#FDE2E0;--bad-fg:#8A1F17;--idle-bg:#E9EEF2;--idle-fg:#55636E;
+  --mock-bg:#FFFFFF;--mock-fg:#0F1419;--mock-muted:#65676B;--mock-line:#E4E6EB;
+  --f-tit:'Poppins',Arial,sans-serif;--f-txt:'Inter',Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12181D;--card:#1B232A;--fg:#E8EDF1;--muted:#A3B0BA;--line:#2C3740;--accent:#4FD27A;--accent2:#4CC3F5;--focus:#4CC3F5;
+  --ok-bg:#163A24;--ok-fg:#7BE3A0;--warn-bg:#3A3214;--warn-fg:#FFD866;--bad-bg:#3D1C1A;--bad-fg:#FF9A90;--idle-bg:#26303A;--idle-fg:#A3B0BA;
+  --mock-bg:#000000;--mock-fg:#E7E9EA;--mock-muted:#8B98A5;--mock-line:#2F3336;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12181D;--card:#1B232A;--fg:#E8EDF1;--muted:#A3B0BA;--line:#2C3740;--accent:#4FD27A;--accent2:#4CC3F5;--focus:#4CC3F5;
+  --ok-bg:#163A24;--ok-fg:#7BE3A0;--warn-bg:#3A3214;--warn-fg:#FFD866;--bad-bg:#3D1C1A;--bad-fg:#FF9A90;--idle-bg:#26303A;--idle-fg:#A3B0BA;
+  --mock-bg:#000000;--mock-fg:#E7E9EA;--mock-muted:#8B98A5;--mock-line:#2F3336;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-txt);font-size:15px;line-height:1.5;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--card)}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-tit);margin:0;letter-spacing:-.01em;text-wrap:balance;line-height:1.2}
+button{font:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.faixa{height:6px;background:linear-gradient(90deg,var(--verde) 0 40%,var(--azul) 40% 60%,var(--amarelo) 60% 100%)}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border-bottom:1px solid var(--line)}
+header .wrap{padding-block:12px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand img{width:34px;height:34px;border-radius:50%;background:#fff;border:1px solid var(--line)}
+.brand h1{font-size:18px;font-weight:800}
+.days{display:flex;gap:6px;overflow-x:auto;max-width:100%;padding-bottom:2px}
+.day{font:600 13px var(--f-tit);border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:999px;padding:6px 12px;cursor:pointer;white-space:nowrap}
+.day[aria-pressed="true"]{background:var(--grafite);color:#fff;border-color:var(--grafite)}
+main{padding-block:22px 80px;display:grid;gap:18px}
+.summary{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:12px}
+.kick{font:600 12px var(--f-tit);letter-spacing:.12em;text-transform:uppercase;color:var(--accent2)}
+.summary h2{font-size:22px;font-weight:800}
+.summary p{margin:0;color:var(--muted);max-width:76ch}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.fonte{font-size:12.5px;border-radius:999px;padding:3px 10px;background:var(--idle-bg);color:var(--idle-fg)}
+.fonte.ok::before{content:"● ";color:var(--verde)}
+.fonte.falha{background:var(--bad-bg);color:var(--bad-fg)}
+.fonte.falha::before{content:"● "}
+.pill{font:600 12px var(--f-tit);border-radius:999px;padding:4px 11px;white-space:nowrap;border:0}
+.st-pendente{background:var(--idle-bg);color:var(--idle-fg)}
+.st-aprovado{background:var(--ok-bg);color:var(--ok-fg)}
+.st-ajustar{background:var(--warn-bg);color:var(--warn-fg)}
+.st-descartado{background:var(--bad-bg);color:var(--bad-fg)}
+button.pill{cursor:pointer;opacity:.6}
+button.pill[aria-pressed="true"]{opacity:1;box-shadow:inset 0 0 0 2px currentColor}
+.list{display:grid;gap:16px}
+.item{background:var(--card);border:1px solid var(--line);border-radius:16px;display:grid;grid-template-columns:8px minmax(0,1fr);overflow:hidden}
+.item .stripe{background:var(--c,#999)}
+.item .inner{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:22px;padding:18px 20px}
+@media (max-width:900px){.item .inner{grid-template-columns:minmax(0,1fr)}}
+.item.descartado .left{opacity:.55}
+.left{display:grid;gap:10px;align-content:start;min-width:0}
+.meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.linha{font:700 12px var(--f-tit);letter-spacing:.06em;text-transform:uppercase}
+.tag{font-size:12px;border:1px solid var(--line);border-radius:6px;padding:1px 8px;color:var(--muted)}
+.prio{font:600 12px var(--f-txt);color:var(--muted);margin-left:auto;font-variant-numeric:tabular-nums}
+.item h3{font-size:19px;font-weight:700}
+.gancho{color:var(--muted);margin:0}
+.note{font-size:13.5px;color:var(--muted)}
+.alerta{font-size:13.5px;background:var(--warn-bg);color:var(--warn-fg);border-radius:10px;padding:8px 12px;white-space:pre-wrap}
+details{border-top:1px solid var(--line);padding-top:8px}
+summary{cursor:pointer;font:600 13px var(--f-tit);color:var(--accent2)}
+ol.slides{margin:8px 0 0;padding-left:22px;display:grid;gap:8px;font-size:14px}
+ol.slides li{white-space:pre-wrap}
+.lbl{font:600 12px var(--f-tit);color:var(--muted);text-transform:uppercase;letter-spacing:.08em;display:block;margin-top:8px}
+textarea{width:100%;min-height:110px;font:14px/1.5 var(--f-txt);color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;resize:vertical;margin-top:4px}
+.src{display:flex;flex-direction:column;gap:3px;font-size:13.5px}
+.src a{color:var(--accent2);overflow-wrap:anywhere}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{font:600 13.5px var(--f-tit);border-radius:10px;padding:8px 14px;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--fg)}
+.btn.aprovar{background:#21B24D;border-color:#21B24D;color:#0B2E17}
+.btn.ajustar{background:var(--amarelo);border-color:var(--amarelo);color:#28323B}
+.btn:disabled{opacity:.5;cursor:default}
+.erro{font-size:13px;background:var(--bad-bg);color:var(--bad-fg);border-radius:8px;padding:6px 10px}
+.empty{background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:28px;text-align:center;color:var(--muted);display:grid;gap:6px}
+.empty b{font-family:var(--f-tit);color:var(--fg);font-size:17px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--grafite);color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;z-index:20;max-width:calc(100% - 32px)}
+/* ===== prévias ===== */
+.prev{display:grid;gap:10px;align-content:start;min-width:0}
+.nets{display:flex;gap:4px;background:var(--bg);border-radius:10px;padding:4px}
+.net{flex:1;font:600 12.5px var(--f-tit);border:0;background:transparent;color:var(--muted);border-radius:7px;padding:6px 4px;cursor:pointer}
+.net[aria-selected="true"]{background:var(--card);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.mock{background:var(--mock-bg);color:var(--mock-fg);border:1px solid var(--mock-line);border-radius:12px;overflow:hidden;font:14px/1.4 -apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+.mh{display:flex;align-items:center;gap:9px;padding:10px 12px}
+.mh img{width:34px;height:34px;border-radius:50%;background:#fff;border:1px solid var(--mock-line);flex:none}
+.mh b{font-weight:600;font-size:13.5px}
+.mh small{display:block;color:var(--mock-muted);font-size:12px}
+.mtxt{padding:0 12px 10px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13.5px}
+.mtxt.cut{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.mais{background:none;border:0;color:var(--mock-muted);cursor:pointer;padding:0 12px 10px;font-size:13px}
+.media{position:relative;background:#000;aspect-ratio:4/5}
+.media img{width:100%;height:100%;object-fit:cover;display:block}
+.media.x{aspect-ratio:auto;margin:0 12px 10px;border-radius:14px;overflow:hidden;border:1px solid var(--mock-line)}
+.media.x img{max-height:420px}
+.nav{position:absolute;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;border:0;background:rgba(255,255,255,.9);color:#222;cursor:pointer;font-size:16px;line-height:30px;padding:0}
+.nav.p{left:8px}.nav.n{right:8px}
+.count{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.6);color:#fff;font-size:12px;border-radius:999px;padding:2px 9px}
+.dots{display:flex;justify-content:center;gap:4px;padding:8px}
+.dots i{width:6px;height:6px;border-radius:50%;background:var(--mock-line)}
+.dots i.on{background:#0095F6}
+.icons{display:flex;gap:14px;padding:4px 12px 6px;color:var(--mock-fg)}
+.icons svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
+.lipager{background:rgba(0,0,0,.7);color:#fff;font-size:12px;text-align:center;padding:4px}
+.placeholder{aspect-ratio:4/5;display:grid;place-content:center;gap:10px;padding:26px;text-align:left;color:#fff;background:var(--c,#28323B)}
+.placeholder b{font:800 22px/1.15 var(--f-tit)}
+.placeholder span{font-size:12.5px;opacity:.85}
+.xfoot{display:flex;justify-content:space-between;padding:0 12px 10px;color:var(--mock-muted);font-size:12.5px}
+.xfoot .over{color:#F4212E;font-weight:700}
+.ytnote{padding:14px;font-size:13.5px;color:var(--mock-muted)}
+/* ===== identidade ===== */
+.kit{display:grid;gap:16px}
+.kitcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:12px}
+.kitcard h3{font-size:18px}
+.kitgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}
+.kitimg{width:100%;border-radius:10px;border:1px solid var(--line);display:block;background:#fff}
+.hl{display:flex;gap:14px;flex-wrap:wrap}
+.hl figure{margin:0;display:grid;justify-items:center;gap:6px;font-size:12.5px;color:var(--muted)}
+.hl .circ{width:76px;height:76px;border-radius:50%;overflow:hidden;border:2px solid var(--line)}
+.hl .circ img{width:100%;height:100%;object-fit:cover}
+.check{display:flex;align-items:center;gap:10px;font-weight:600}
+.check input{width:20px;height:20px;accent-color:#21B24D}
+ol.passos{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14px;color:var(--muted)}
+.arq{font-size:12.5px;color:var(--muted);font-family:ui-monospace,Consolas,monospace;overflow-wrap:anywhere}
+</style>
+
+<header>
+  <div class="faixa"></div>
+  <div class="wrap">
+    <div class="brand"><img src="logos/simbolo_colorido.png" alt=""><h1>Central de publicações</h1></div>
+    <div class="days" id="days" role="group" aria-label="Escolher pauta"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="summary" id="summary">
+    <span class="kick">Licita Mais Brasil · Instagram, Facebook, LinkedIn, X e YouTube</span>
+    <h2 id="sumTitle">Carregando…</h2>
+    <p id="sumText">A coleta automática roda todo dia às 6h. Confira a prévia de cada rede e aprove o que pode ser publicado.</p>
+    <div class="row" id="counts"></div>
+    <div class="row" id="fontes"></div>
+  </section>
+  <div class="row" id="filters" role="group" aria-label="Filtrar por situação"></div>
+  <div class="list" id="list"></div>
+</main>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const LINHAS={
+  jurisprudencia:{nome:'Jurisprudência TCU',cor:'#28323B'},
+  oportunidade:{nome:'Oportunidades',cor:'#21B24D'},
+  novidade:{nome:'Novidade da plataforma',cor:'#0270A6'},
+  legislacao:{nome:'Legislação e dicas',cor:'#E0A800'},
+  institucional:{nome:'Institucional',cor:'#0F6B34'},
+  noticia:{nome:'Notícias do setor',cor:'#03A2E4'}
+};
+const STATUS={pendente:'Pendente',aprovado:'Aprovado',ajustar:'Ajustar',descartado:'Descartado'};
+const AVATAR='logos/simbolo_colorido.png';
+const KIT=[
+  {rede:'instagram',nome:'Instagram',arquivos:['Perfil_Todas_as_Redes_1080x1080.png'],destaques:true,passos:['No app, abra o perfil e toque em Editar perfil › Editar foto.','Envie Perfil_Todas_as_Redes_1080x1080.png.','Para cada destaque: toque e segure › Editar destaque › Editar capa › escolha o arquivo Destaque_….png correspondente.','Crie o destaque "Oportunidades" com a capa Destaque_Oportunidades.png.']},
+  {rede:'facebook',nome:'Facebook',arquivos:['Perfil_Todas_as_Redes_1080x1080.png','Facebook_Capa_1640x624.png'],passos:['Na página, clique na foto de perfil › Atualizar foto do perfil.','Clique em Editar foto da capa › Carregar foto › Facebook_Capa_1640x624.png.','Arraste para centralizar, se necessário, e salve.']},
+  {rede:'linkedin',nome:'LinkedIn',arquivos:['Perfil_Todas_as_Redes_1080x1080.png','LinkedIn_Capa_1128x191.png'],passos:['Entre como administrador da página › Editar página.','Em Cabeçalho, envie o logotipo (Perfil_…) e a imagem de capa (LinkedIn_Capa_1128x191.png).','Salve.']},
+  {rede:'youtube',nome:'YouTube',arquivos:['Perfil_Todas_as_Redes_1080x1080.png','YouTube_Banner_2560x1440.png'],passos:['Abra o YouTube Studio › Personalização › Branding.','Imagem do perfil: Perfil_…; Imagem do banner: YouTube_Banner_2560x1440.png.','Publicar.']},
+  {rede:'x',nome:'X',arquivos:['Perfil_Todas_as_Redes_1080x1080.png','X_Capa_1500x500.png'],passos:['No perfil @licitamaisbr, clique em Editar perfil.','Troque a foto (Perfil_…) e o cabeçalho (X_Capa_1500x500.png).','Salvar.']}
+];
+const DESTAQUES=[['Jurisprudência','Destaque_Jurisprudencia.png'],['Legislação','Destaque_Legislacao.png'],['Ferramentas','Destaque_Ferramentas.png'],['A Plataforma','Destaque_Plataforma.png'],['Perguntas','Destaque_Perguntas.png'],['Oportunidades','Destaque_Oportunidades.png']];
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtDia=d=>{if(d==='reedicao')return'Reedição';if(d==='identidade')return'Identidade';if(!/^\d{4}-\d{2}-\d{2}$/.test(d))return d;const[y,m,dd]=d.split('-');return new Date(+y,+m-1,+dd).toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})};
+let db=null,me=null,canWrite=true,dia=null,pautas=[],itens=[],kitDocs={},unsubItens=null;
+const filtro=new Set(['pendente','ajustar','aprovado']);
+const prevState={};   // por item: {net, slide}
+const erros={};       // por item: última mensagem de erro de gravação
+const salvando=new Set();
+function toast(t){const el=$('toast');el.textContent=t;el.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>el.hidden=true,3200)}
+const msgErro=e=>{const c=e&&e.code;return c==='invalid_argument'?'O servidor recusou a gravação (sem permissão de escrita ou dado inválido).':c==='unavailable'?'Conexão instável. Tente de novo em alguns segundos.':c==='resource_exhausted'?'Muitas gravações seguidas. Aguarde um instante.':c==='revoked'?'O acesso a esta página mudou. Recarregue.':'Não foi possível gravar'+(c?` (código: ${c})`:'')+'.'};
+
+/* ---------- topo e resumo ---------- */
+function renderDays(){
+  const box=$('days');box.innerHTML='';
+  [...pautas.map(p=>p.id),'identidade'].forEach(id=>{const b=document.createElement('button');b.className='day';b.textContent=fmtDia(id);
+    b.setAttribute('aria-pressed',id===dia?'true':'false');b.onclick=()=>selectDia(id);box.appendChild(b)});
+}
+function renderSummary(){
+  if(dia==='identidade'){$('sumTitle').textContent='Identidade visual das redes';
+    $('sumText').textContent='Foto de perfil, capas e capas de destaques no padrão novo. As redes não permitem trocar esses itens por integração, então cada rede é atualizada à mão. Marque cada uma depois de aplicar.';
+    const feitas=KIT.filter(k=>kitDocs[k.rede]?.aplicado).length;
+    $('counts').innerHTML=`<span class="pill ${feitas===KIT.length?'st-aprovado':'st-pendente'}">${feitas} de ${KIT.length} redes atualizadas</span>`;$('fontes').innerHTML='';$('filters').hidden=true;return}
+  $('filters').hidden=false;
+  const p=pautas.find(x=>x.id===dia);
+  if(!p){$('sumTitle').textContent=pautas.length?'Escolha uma pauta':'Nenhuma pauta ainda';
+    $('sumText').textContent='A primeira pauta aparece aqui depois da coleta das 6h.';$('counts').innerHTML='';$('fontes').innerHTML='';return}
+  $('sumTitle').textContent=p.titulo||('Pauta de '+fmtDia(p.id));
+  $('sumText').textContent=p.resumo||'';
+  const c={pendente:0,aprovado:0,ajustar:0,descartado:0};itens.forEach(i=>c[i.status||'pendente']++);
+  $('counts').innerHTML=Object.keys(c).map(k=>`<span class="pill st-${k}">${c[k]} ${STATUS[k].toLowerCase()}</span>`).join('');
+  $('fontes').innerHTML=(p.fontes||[]).map(f=>`<span class="fonte ${f.ok?'ok':'falha'}" title="${esc(f.nota||'')}">${esc(f.nome)}${f.ok?'':' · falhou'}</span>`).join('');
+}
+function renderFilters(){
+  $('filters').innerHTML='';
+  Object.keys(STATUS).forEach(k=>{const b=document.createElement('button');b.className='pill st-'+k;b.textContent=STATUS[k];
+    b.setAttribute('aria-pressed',filtro.has(k)?'true':'false');
+    b.onclick=()=>{filtro.has(k)?filtro.delete(k):filtro.add(k);renderFilters();renderList()};$('filters').appendChild(b)});
+}
+
+/* ---------- prévias ---------- */
+function redesDo(i){
+  const f=(i.formatos||[]).join(' ');const r=['instagram','facebook'];
+  if(/LinkedIn/i.test(f))r.push('linkedin');
+  if(i.textoX!=null||/\bX\b/.test(f))r.push('x');
+  if(/YouTube|Short/i.test(f))r.push('youtube');
+  return r;
+}
+const NOMES={instagram:'Instagram',facebook:'Facebook',linkedin:'LinkedIn',x:'X',youtube:'YouTube'};
+const ICON={coracao:'<svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',
+  balao:'<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-3.3-6.5L20 4l-.8 4A8 8 0 0 1 20 12z"/></svg>',
+  enviar:'<svg viewBox="0 0 24 24"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4z"/></svg>',
+  salvar:'<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>'};
+function midia(i,st,tipo){
+  const imgs=i.imagens||[];
+  if(!imgs.length){const L=LINHAS[i.linha]||{cor:'#28323B'};return `<div class="placeholder" style="--c:${L.cor}"><b>${esc(i.titulo)}</b><span>A arte é gerada depois da aprovação do texto.</span></div>`}
+  const n=Math.min(st.slide,imgs.length-1);
+  const nav=imgs.length>1?`${n>0?`<button class="nav p" data-act="slide" data-d="-1" data-id="${esc(i.id)}" aria-label="Tela anterior">‹</button>`:''}${n<imgs.length-1?`<button class="nav n" data-act="slide" data-d="1" data-id="${esc(i.id)}" aria-label="Próxima tela">›</button>`:''}`:'';
+  if(tipo==='x')return `<div class="media x"><img src="${esc(imgs[0])}" alt="Imagem do post"></div>`;
+  return `<div class="media"><img src="${esc(imgs[n])}" alt="Tela ${n+1} de ${imgs.length}" loading="lazy">${nav}${imgs.length>1&&tipo!=='li'?`<span class="count">${n+1}/${imgs.length}</span>`:''}</div>${tipo==='li'&&imgs.length>1?`<div class="lipager">${n+1} / ${imgs.length} · documento</div>`:''}${tipo==='ig'&&imgs.length>1?`<div class="dots">${imgs.map((_,k)=>`<i class="${k===n?'on':''}"></i>`).join('')}</div>`:''}`;
+}
+function textoMock(id,txt){const longo=(txt||'').length>140||(txt||'').split('\n').length>3;
+  return `<div class="mtxt ${longo&&!prevState[id].aberto?'cut':''}">${esc(txt)}</div>${longo?`<button class="mais" data-act="mais" data-id="${esc(id)}">${prevState[id].aberto?'ver menos':'… ver mais'}</button>`:''}`}
+function previa(i){
+  const redes=redesDo(i);const st=prevState[i.id]||(prevState[i.id]={net:redes[0],slide:0,aberto:false});
+  if(!redes.includes(st.net))st.net=redes[0];
+  const leg=$('leg-'+i.id)?.value??i.legenda??'';const tx=$('x-'+i.id)?.value??i.textoX??'';
+  let corpo='';
+  if(st.net==='instagram')corpo=`<div class="mock"><div class="mh"><img src="${AVATAR}" alt=""><div><b>licitamaisbrasil</b></div></div>${midia(i,st,'ig')}
+    <div class="icons">${ICON.coracao}${ICON.balao}${ICON.enviar}<span style="margin-left:auto">${ICON.salvar}</span></div>${textoMock(i.id,leg?('licitamaisbrasil '+leg):'(legenda vazia)')}</div>`;
+  else if(st.net==='facebook')corpo=`<div class="mock"><div class="mh"><img src="${AVATAR}" alt=""><div><b>Licita Mais Brasil</b><small>Agora · Público</small></div></div>${textoMock(i.id,leg||'(legenda vazia)')}${midia(i,st,'fb')}</div>`;
+  else if(st.net==='linkedin')corpo=`<div class="mock"><div class="mh"><img src="${AVATAR}" alt=""><div><b>Licita Mais Brasil</b><small>Página · Agora</small></div></div>${textoMock(i.id,leg||'(legenda vazia)')}${midia(i,st,'li')}</div>`;
+  else if(st.net==='x'){const n=[...tx].length;corpo=`<div class="mock"><div class="mh"><img src="${AVATAR}" alt=""><div><b>Licita Mais Brasil</b><small>@licitamaisbr · agora</small></div></div>
+    <div class="mtxt">${esc(tx||'(texto para o X vazio)')}</div>${midia(i,st,'x')}<div class="xfoot"><span>Prévia do X</span><span class="${n>280?'over':''}">${n}/280</span></div></div>`}
+  else corpo=`<div class="mock"><div class="mh"><img src="${AVATAR}" alt=""><div><b>Licita Mais Brasil</b><small>YouTube</small></div></div><div class="ytnote">Vídeo: o roteiro está na coluna ao lado. A prévia aparece quando o vídeo for editado.</div></div>`;
+  return `<div class="prev"><div class="nets" role="tablist" aria-label="Prévia por rede">${redes.map(r=>`<button class="net" role="tab" aria-selected="${r===st.net}" data-act="net" data-net="${r}" data-id="${esc(i.id)}">${NOMES[r]}</button>`).join('')}</div>${corpo}</div>`;
+}
+function renderPrev(id){const i=itens.find(x=>x.id===id);const box=document.querySelector(`[data-prev="${CSS.escape(id)}"]`);if(i&&box)box.innerHTML=previa(i)}
+
+/* ---------- lista ---------- */
+function renderList(){
+  const box=$('list');
+  if(dia==='identidade'){renderKit();return}
+  const open=new Set([...box.querySelectorAll('details[open]')].map(d=>d.dataset.k));
+  const drafts={};box.querySelectorAll('textarea').forEach(t=>drafts[t.id]=t.value);
+  const vis=itens.filter(i=>filtro.has(i.status||'pendente')).sort((a,b)=>(b.prioridade||0)-(a.prioridade||0)||String(a.id).localeCompare(b.id));
+  if(!dia){box.innerHTML='';return}
+  if(!vis.length){box.innerHTML=`<div class="empty"><b>${itens.length?'Nada neste filtro':'Sem sugestões nesta pauta'}</b><span>${itens.length?'Ative outras situações acima para ver as demais.':'Quando a coleta encontrar temas, eles aparecem aqui.'}</span></div>`;return}
+  box.innerHTML=vis.map(i=>{
+    const L=LINHAS[i.linha]||{nome:i.linha||'Tema',cor:'#999'};const st=i.status||'pendente';const id=esc(i.id);
+    const slides=Array.isArray(i.slides)&&i.slides.length?`<ol class="slides">${i.slides.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>`:'';
+    const fontes=(i.fontes||[]).map(f=>`<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.titulo||f.url)}</a>`).join('');
+    const antes=(i.roteiro||'').match(/Antes de publicar:([\s\S]*)/);
+    const legV=drafts['leg-'+i.id]??i.legenda??'';const xV=drafts['x-'+i.id]??i.textoX;
+    const ocup=salvando.has(i.id)?'disabled':'';
+    return `<article class="item ${st}" style="--c:${L.cor}"><div class="stripe"></div><div class="inner">
+      <div class="left">
+        <div class="meta"><span class="linha">${esc(L.nome)}</span>${(i.formatos||[]).map(f=>`<span class="tag">${esc(f)}</span>`).join('')}<span class="pill st-${st}">${STATUS[st]}</span><span class="prio">prioridade ${esc(i.prioridade??'–')}/5</span></div>
+        <h3>${esc(i.titulo)}</h3>
+        ${i.gancho?`<p class="gancho">${esc(i.gancho)}</p>`:''}
+        ${i.baseLegal?`<div class="note"><b>Base:</b> ${esc(i.baseLegal)}</div>`:''}
+        ${antes?`<div class="alerta"><b>Antes de publicar:</b>${esc(antes[1])}</div>`:''}
+        ${i.comentario?`<div class="alerta"><b>Pedido de ajuste:</b> ${esc(i.comentario)}</div>`:''}
+        <details data-k="t-${id}" ${open.has('t-'+i.id)?'open':''}><summary>Telas e roteiro (${(i.slides||[]).length||'—'})</summary>${slides}${i.roteiro&&!antes?`<p class="note" style="white-space:pre-wrap">${esc(i.roteiro)}</p>`:''}${i.arquivos?`<p class="arq">${esc(i.arquivos)}</p>`:''}</details>
+        <details data-k="l-${id}" ${open.has('l-'+i.id)?'open':''}><summary>Editar legenda${xV!=null?' e texto do X':''}</summary>
+          <label class="lbl" for="leg-${id}">Legenda (Instagram, Facebook, LinkedIn)</label>
+          <textarea id="leg-${id}" data-prev-for="${id}" ${canWrite?'':'readonly'}>${esc(legV)}</textarea>
+          ${xV!=null?`<label class="lbl" for="x-${id}">Texto do X · <span class="xc" data-for="x-${id}">${[...xV].length}</span>/280</label><textarea id="x-${id}" data-prev-for="${id}" style="min-height:80px" ${canWrite?'':'readonly'}>${esc(xV)}</textarea>`:''}
+          <div class="actions" style="margin-top:8px"><button class="btn" data-act="copiar" data-id="${id}">Copiar legenda</button>${canWrite?`<button class="btn" data-act="salvar" data-id="${id}" ${ocup}>Salvar textos</button>`:''}</div>
+        </details>
+        ${fontes?`<div class="src"><span class="lbl">Fontes</span>${fontes}</div>`:''}
+        ${canWrite?`<div class="actions">
+          <button class="btn aprovar" data-act="aprovado" data-id="${id}" ${st==='aprovado'||ocup?'disabled':''}>${st==='aprovado'?'Aprovado':'Aprovar'}</button>
+          <button class="btn ajustar" data-act="ajustar" data-id="${id}" ${ocup}>Pedir ajuste</button>
+          <button class="btn" data-act="descartado" data-id="${id}" ${st==='descartado'||ocup?'disabled':''}>Descartar</button>
+          ${st!=='pendente'?`<button class="btn" data-act="pendente" data-id="${id}" ${ocup}>Voltar a pendente</button>`:''}
+        </div>`:'<div class="note">Você pode ver a pauta, mas não aprovar.</div>'}
+        ${salvando.has(i.id)?'<div class="note">Gravando…</div>':''}
+        ${erros[i.id]?`<div class="erro" role="alert">${esc(erros[i.id])}</div>`:''}
+        ${i.decididoEm&&st!=='pendente'?`<div class="note">Decisão gravada em ${esc(new Date(i.decididoEm).toLocaleString('pt-BR'))}</div>`:''}
+        <div class="ajuste" id="aj-${id}" hidden><label class="lbl" for="cm-${id}">O que precisa mudar?</label><textarea id="cm-${id}" style="min-height:70px">${esc(drafts['cm-'+i.id]??'')}</textarea><div class="actions" style="margin-top:6px"><button class="btn ajustar" data-act="enviar-ajuste" data-id="${id}">Enviar pedido</button></div></div>
+      </div>
+      <div data-prev="${id}">${previa(i)}</div>
+    </div></article>`}).join('');
+}
+function renderKit(){
+  const base='kit-redes/';
+  $('list').innerHTML=`<div class="kit">
+    <div class="kitcard"><h3>Foto de perfil, igual nas cinco redes</h3><div class="row"><img src="${base}Perfil_Todas_as_Redes_1080x1080.png" alt="Foto de perfil" style="width:110px;height:110px;border-radius:50%;border:1px solid var(--line);background:#fff"><p class="note" style="max-width:60ch">O símbolo colorido sobre branco, arquivo oficial. Nome de exibição "Licita Mais Brasil" em todas as redes.</p></div></div>
+    <div class="kitcard"><h3>Capas dos destaques do Instagram</h3><div class="hl">${DESTAQUES.map(([n,a])=>`<figure><div class="circ"><img src="${base}${a}" alt=""></div><figcaption>${esc(n)}</figcaption></figure>`).join('')}</div></div>
+    <div class="kitgrid">${KIT.map(k=>{const d=kitDocs[k.rede]||{};const capa=k.arquivos.find(a=>!a.startsWith('Perfil'));
+      return `<div class="kitcard"><h3>${esc(k.nome)}</h3>${capa?`<img class="kitimg" src="${base}${capa}" alt="Capa ${esc(k.nome)}">`:''}
+      <ol class="passos">${k.passos.map(p=>`<li>${esc(p)}</li>`).join('')}</ol>
+      <p class="arq">Arquivos: marca/saida/kit-redes/ · ${k.arquivos.map(esc).join(' · ')}${k.destaques?' · Destaque_*.png':''}</p>
+      <label class="check"><input type="checkbox" id="kit-${k.rede}" data-act="kit" data-rede="${k.rede}" ${d.aplicado?'checked':''} ${canWrite?'':'disabled'}> Aplicado no ${esc(k.nome)}</label>
+      ${d.aplicado&&d.em?`<span class="note">Marcado em ${esc(new Date(d.em).toLocaleString('pt-BR'))}</span>`:''}${erros['kit-'+k.rede]?`<div class="erro" role="alert">${esc(erros['kit-'+k.rede])}</div>`:''}</div>`}).join('')}</div></div>`;
+}
+function renderAll(){renderDays();renderSummary();renderFilters();renderList()}
+
+/* ---------- gravações ---------- */
+async function gravar(id,dados,ok){
+  if(!db){toast('Banco indisponível nesta visualização');return false}
+  salvando.add(id);delete erros[id];renderList();
+  try{await db.collection('itens').doc(id).update(dados);if(ok)toast(ok);return true}
+  catch(e){erros[id]=msgErro(e);if(e&&e.code==='invalid_argument'&&!(await podeEscrever()))canWrite=false;return false}
+  finally{salvando.delete(id);renderList()}
+}
+async function podeEscrever(){try{const u=await claude.use('user');return u?(await u.can('data.write'))!==false:true}catch(e){return true}}
+const decisao=(status,extra={})=>({status,decididoEm:new Date().toISOString(),decididoPor:me||'',...extra});
+
+document.addEventListener('click',async ev=>{
+  const b=ev.target.closest('[data-act]');if(!b||b.tagName==='INPUT')return;const id=b.dataset.id,act=b.dataset.act;
+  if(act==='net'){prevState[id].net=b.dataset.net;prevState[id].slide=0;renderPrev(id);return}
+  if(act==='slide'){const i=itens.find(x=>x.id===id);const n=(i.imagens||[]).length;prevState[id].slide=Math.max(0,Math.min(n-1,prevState[id].slide+ +b.dataset.d));renderPrev(id);return}
+  if(act==='mais'){prevState[id].aberto=!prevState[id].aberto;renderPrev(id);return}
+  if(act==='copiar'){const t=$('leg-'+id);try{await navigator.clipboard.writeText(t.value);toast('Legenda copiada')}catch(e){t.focus();t.select();toast('Texto selecionado: use Ctrl+C')}return}
+  if(act==='salvar'){const d={legenda:$('leg-'+id).value,editadoEm:new Date().toISOString()};const x=$('x-'+id);if(x){if([...x.value].length>280){toast('O X aceita até 280 caracteres');return}d.textoX=x.value}
+    await gravar(id,d,'Textos salvos');return}
+  if(act==='ajustar'){const box=$('aj-'+id);box.hidden=!box.hidden;if(!box.hidden)$('cm-'+id).focus();return}
+  if(act==='enviar-ajuste'){const c=$('cm-'+id).value.trim();if(!c){toast('Escreva o que precisa mudar');return}await gravar(id,decisao('ajustar',{comentario:c}),'Pedido de ajuste enviado');return}
+  if(STATUS[act])await gravar(id,decisao(act,act==='pendente'?{comentario:''}:{}),'Marcado como '+STATUS[act].toLowerCase());
+});
+document.addEventListener('change',async ev=>{
+  const t=ev.target;if(t.dataset.act!=='kit'||!db)return;const rede=t.dataset.rede;delete erros['kit-'+rede];
+  try{await db.collection('kit').doc(rede).set({aplicado:t.checked,em:new Date().toISOString(),por:me||''});toast(t.checked?'Rede marcada como atualizada':'Marcação removida')}
+  catch(e){erros['kit-'+rede]=msgErro(e);t.checked=!t.checked;renderList()}
+});
+document.addEventListener('input',ev=>{const t=ev.target;
+  if(t.id&&t.id.startsWith('x-')){const c=document.querySelector(`.xc[data-for="${t.id}"]`);if(c){const n=[...t.value].length;c.textContent=n;c.style.color=n>280?'var(--bad-fg)':''}}
+  if(t.dataset.prevFor){clearTimeout(t._p);t._p=setTimeout(()=>renderPrev(t.dataset.prevFor),250)}
+});
+
+function selectDia(d){
+  dia=d;try{localStorage.setItem('pauta-dia',d)}catch(e){}
+  if(unsubItens){unsubItens();unsubItens=null}itens=[];renderAll();
+  if(d==='identidade'||!db)return;
+  unsubItens=db.collection('itens').where('dia','==',d).onSnapshot(s=>{itens=s.docs.map(x=>({...x.data(),id:x.id}));renderSummary();renderList()},
+    e=>{$('sumText').textContent='A conexão com a pauta caiu ('+(e&&e.code||'erro')+'). Recarregue a página.'});
+}
+renderAll();
+(async()=>{
+  db=await claude.use('db');const user=await claude.use('user');
+  if(!db){$('sumTitle').textContent='Central indisponível';$('sumText').textContent='Entre na sua conta Claude com acesso a esta página para ver e aprovar as publicações.';return}
+  try{me=user?await user.id():null;const c=user?await user.can('data.write'):null;if(c===false)canWrite=false}catch(e){}
+  db.collection('kit').onSnapshot(s=>{kitDocs={};s.docs.forEach(x=>kitDocs[x.id]=x.data());if(dia==='identidade'){renderSummary();renderList()}},()=>{});
+  db.collection('pautas').orderBy('id','desc').limit(30).onSnapshot(s=>{
+    pautas=s.docs.map(x=>({...x.data(),id:x.id}));
+    if(!dia){let saved=null;try{saved=localStorage.getItem('pauta-dia')}catch(e){}
+      const firstDay=pautas.find(p=>/^\d/.test(p.id));
+      const pick=(saved==='identidade'||pautas.some(p=>p.id===saved))?saved:((firstDay||pautas[0])&&(firstDay||pautas[0]).id);if(pick){selectDia(pick);return}}
+    renderDays();renderSummary();
+  },e=>{$('sumText').textContent='Não foi possível carregar as pautas ('+(e&&e.code||'erro')+'). Recarregue a página.'});
+})();
+</script>

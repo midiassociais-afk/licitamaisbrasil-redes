@@ -1,0 +1,5 @@
+node_modules/
+marca/saida/_db/
+marca/saida/_revisao/
+*.pdf
+*.log

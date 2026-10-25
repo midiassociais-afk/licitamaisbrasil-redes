@@ -1,0 +1,245 @@
+[
+{
+ "id": "reedicao-pncp-atas-contratos", "tema": "legislacao", "arquivo": "01_PNCP_Atas_Contratos",
+ "slides": [
+  {"tipo": "capa", "kicker": "PNCP · Atas e contratos", "titulo": "Seu contrato só vale depois de publicado no PNCP", "sub": "Campos obrigatórios e prazos que o órgão não pode perder."},
+  {"tipo": "texto", "kicker": "Regra da lei", "titulo": "Sem PNCP, sem eficácia", "texto": "A divulgação no Portal Nacional de Contratações Públicas é condição indispensável para a eficácia do contrato e de seus aditamentos.", "destaque": "Art. 94 da Lei 14.133/2021"},
+  {"tipo": "lista", "kicker": "Prazos contados da assinatura", "titulo": "Quanto tempo você tem", "itens": ["20 dias úteis quando o contrato vem de licitação", "10 dias úteis quando vem de contratação direta", "Contrato de urgência vale na assinatura, mas também precisa ser publicado nesses prazos"]},
+  {"tipo": "lista", "kicker": "Atas de registro de preços", "titulo": "O que o PNCP passou a pedir", "itens": ["Se a ata permite adesão de órgãos não participantes", "Quem são os participantes da ata", "O papel de cada órgão: gerenciador, participante ou não participante"]},
+  {"tipo": "lista", "kicker": "Contratos", "titulo": "Novos campos no envio", "itens": ["Número sequencial da ata no PNCP", "Se o contrato é fruto de adesão", "Remanejamento de quantidades", "Subcontratados"]},
+  {"tipo": "cta", "titulo": "Publique atas e contratos sem erro de campo", "texto": "A Licita Mais Brasil já envia tudo no formato que o PNCP exige.", "url": "licitamaisbrasil.com.br"}
+ ],
+ "legenda": "Contrato assinado não basta: sem publicação no PNCP, ele não tem eficácia.\n\nA Lei 14.133/2021 (art. 94) dá 20 dias úteis para publicar contratos que vêm de licitação e 10 dias úteis para os de contratação direta. E o PNCP passou a exigir novos campos nas atas e nos contratos, como a indicação de adesão e o número sequencial da ata.\n\nArraste para conferir o checklist e salve para a próxima publicação.\n\n#lei14133 #pncp #licitações #gestãopública",
+ "textoX": "Contrato sem publicação no PNCP não tem eficácia (art. 94 da Lei 14.133). Prazos: 20 dias úteis (licitação) e 10 (contratação direta). Veja os campos novos de atas e contratos: licitamaisbrasil.com.br #PNCP",
+ "nota": "Antes de publicar, confira se o PNCP mudou outros campos depois de maio/2026."
+},
+{
+ "id": "reedicao-tcu-plataformas-privadas", "tema": "jurisprudencia", "arquivo": "02_TCU_Plataformas_Privadas",
+ "slides": [
+  {"tipo": "capa", "kicker": "Jurisprudência TCU", "titulo": "O que o TCU decidiu sobre plataformas privadas de licitação", "sub": "Acórdão 2.916/2025-Plenário"},
+  {"tipo": "texto", "kicker": "O ponto de partida", "titulo": "Plataforma privada é permitida, com regras", "texto": "A Lei 14.133 admite sistema eletrônico de pessoa jurídica de direito público ou privado, desde que integrado ao PNCP e na forma de regulamento do Poder Executivo federal.", "destaque": "Art. 175, § 1º, da Lei 14.133/2021"},
+  {"tipo": "texto", "kicker": "A determinação", "titulo": "Casa Civil tem 180 dias para regulamentar", "texto": "Em sessão de 08/12/2025, o Plenário determinou à Casa Civil que regulamente o tema, com requisitos de integração ao PNCP e de segurança da informação compatíveis com o risco.", "destaque": "Prazo: 180 dias a partir da decisão"},
+  {"tipo": "lista", "kicker": "Pontos de atenção", "titulo": "O que pesou na análise", "itens": ["Taxas sem respaldo legal que afastam fornecedores", "Coleta de dados que identifica o licitante antes da hora", "Sessões fora do horário de expediente", "Acesso do cidadão para impugnar e acompanhar"]},
+  {"tipo": "texto", "kicker": "Para o seu município", "titulo": "Antes de usar verba federal, confira a plataforma", "texto": "Integração ao PNCP, regras claras de custo e transparência para o cidadão reduzem o risco de questionamento das contas.", "destaque": "Salve para consultar ao planejar a contratação"},
+  {"tipo": "cta", "titulo": "Plataforma integrada ao PNCP e com custos claros", "texto": "Conheça como a Licita Mais Brasil atende órgãos e fornecedores.", "url": "licitamaisbrasil.com.br"}
+ ],
+ "legenda": "Plataforma privada de licitação pode? Pode, desde que integrada ao PNCP e seguindo o regulamento federal (art. 175, § 1º, da Lei 14.133/2021).\n\nNo Acórdão 2.916/2025-Plenário (sessão de 08/12/2025), o TCU determinou à Casa Civil que regulamente o tema em 180 dias, com requisitos de integração e de segurança da informação.\n\nArraste para ver os pontos de atenção e envie para quem cuida das compras do seu órgão.\n\n#jurisprudenciatcu #licitações #lei14133 #pregoeiro",
+ "textoX": "TCU (Acórdão 2.916/2025-Plenário) determinou à Casa Civil regulamentar, em 180 dias, o uso de plataformas privadas de licitação integradas ao PNCP (art. 175, §1º, Lei 14.133). Entenda: licitamaisbrasil.com.br",
+ "nota": "Corrigido: o post antigo dizia que a determinação era ao MGI; segundo a notícia do TCU de 21/01/2026, foi à Casa Civil. Os pontos de atenção vêm do post original: confira no inteiro teor do acórdão e veja se a regulamentação já saiu antes de publicar."
+},
+{
+ "id": "reedicao-garantia-proposta", "tema": "jurisprudencia", "arquivo": "03_TCU_Garantia_Proposta",
+ "slides": [
+  {"tipo": "capa", "kicker": "Jurisprudência TCU", "titulo": "Sem garantia na proposta, licitante desclassificado", "sub": "Acórdão 1.128/2026 do TCU"},
+  {"tipo": "texto", "kicker": "O que diz a lei", "titulo": "Garantia de proposta é pré-habilitação", "texto": "O edital pode exigir a comprovação da garantia no momento da apresentação da proposta. O valor não pode passar de 1% do valor estimado da contratação.", "destaque": "Art. 58 da Lei 14.133/2021"},
+  {"tipo": "texto", "kicker": "O que o TCU entendeu", "titulo": "Quem não apresentou no envio da proposta pode ser desclassificado", "texto": "O Tribunal validou a desclassificação de licitantes que não apresentaram a garantia junto com a proposta inicial."},
+  {"tipo": "lista", "kicker": "Recomendações ao órgão", "titulo": "Deixe a regra clara", "itens": ["Discipline a garantia em norma e em minutas padronizadas", "Diga no edital o momento exato de apresentar", "Defina como fica no orçamento sigiloso", "Use sistema que exija o comprovante no cadastro da proposta"]},
+  {"tipo": "lista", "kicker": "Na Licita Mais Brasil", "titulo": "Como fica no sistema", "itens": ["Campo próprio para a garantia na proposta", "No fluxo normal, ela só aparece depois dos lances", "No fluxo invertido, segue com a habilitação"]},
+  {"tipo": "cta", "titulo": "Rito do TCU cumprido pelo próprio sistema", "texto": "Fale com a nossa equipe e conheça as soluções para órgãos.", "url": "licitamaisbrasil.com.br"}
+ ],
+ "legenda": "O licitante que não apresentou a garantia junto com a proposta pode ser desclassificado. É o que o TCU validou no Acórdão 1.128/2026.\n\nA Lei 14.133/2021 trata a garantia de proposta como requisito de pré-habilitação, limitada a 1% do valor estimado (art. 58). Para o órgão, a lição é deixar o momento de apresentação claro no edital.\n\nArraste para ver as recomendações e salve para o próximo edital.\n\n#jurisprudenciatcu #licitações #lei14133 #pregoeiro",
+ "textoX": "TCU (Acórdão 1.128/2026) validou a desclassificação de quem não apresentou a garantia junto com a proposta. Ela é pré-habilitação e vai até 1% do valor estimado (art. 58, Lei 14.133). licitamaisbrasil.com.br",
+ "nota": "O número e a conclusão do acórdão vêm do post original de 18/05/2026."
+},
+{
+ "id": "reedicao-sicx", "tema": "legislacao", "arquivo": "04_Sicx_Compras_Expressas",
+ "slides": [
+  {"tipo": "capa", "kicker": "Legislação · Lei 15.266/2025", "titulo": "Compras expressas: o que é o Sicx", "sub": "O credenciamento por comércio eletrônico chegou à Lei 14.133."},
+  {"tipo": "texto", "kicker": "A mudança", "titulo": "Uma nova hipótese de credenciamento", "texto": "A Administração pode contratar bens e serviços comuns e padronizados ofertados no Sistema de Compras Expressas (Sicx).", "destaque": "Art. 79, IV, da Lei 14.133/2021"},
+  {"tipo": "texto", "kicker": "Na prática", "titulo": "Um catálogo oficial de compras", "texto": "Fornecedores credenciados ofertam produtos e serviços padronizados, e o órgão compra com rapidez, dentro de regras definidas para todos."},
+  {"tipo": "lista", "kicker": "Depende de regulamento", "titulo": "O que o regulamento federal vai definir", "itens": ["Como fornecedores entram e permanecem", "Como bens e serviços são incluídos", "Formação de preços, entrega e pagamento", "Sanções"], "destaque": "Art. 79, § 1º, VII"},
+  {"tipo": "cta", "titulo": "Prepare-se para as compras expressas", "texto": "A Licita Mais Brasil acompanha a regulamentação e já trabalha na sua ferramenta.", "url": "licitamaisbrasil.com.br"}
+ ],
+ "legenda": "Já ouviu falar do Sicx? A Lei 15.266/2025 incluiu na Lei 14.133 o credenciamento por comércio eletrônico, para bens e serviços comuns e padronizados ofertados no Sistema de Compras Expressas (art. 79, IV).\n\nO funcionamento depende de regulamento do Poder Executivo federal, que vai tratar de admissão de fornecedores, preços, entrega, pagamento e sanções.\n\nSiga o perfil para saber quando as regras saírem.\n\n#lei14133 #licitações #comprasPúblicas #sicx",
+ "textoX": "A Lei 15.266/2025 criou o credenciamento por comércio eletrônico no Sistema de Compras Expressas (Sicx), art. 79, IV, da Lei 14.133. Ele ainda depende de regulamento federal. Entenda: licitamaisbrasil.com.br",
+ "nota": "Até 25/10/2026 só encontrei um grupo de trabalho na SEGES e uma minuta em consulta pública; nenhum decreto final. Confirme antes de publicar e, se o decreto tiver saído, atualize a tela 4."
+},
+{
+ "id": "reedicao-pca", "tema": "novidade", "arquivo": "05_PCA_PNCP",
+ "slides": [
+  {"tipo": "capa", "kicker": "Novidade na plataforma", "titulo": "Publique o PCA no PNCP em poucos passos", "sub": "Plano de Contratações Anual sem planilha e sem retrabalho."},
+  {"tipo": "texto", "kicker": "Por que importa", "titulo": "O PCA organiza as compras do ano", "texto": "A partir dos documentos de formalização de demandas, o órgão consolida o que pretende contratar no exercício seguinte e divulga o plano.", "destaque": "Art. 12, VII, da Lei 14.133/2021"},
+  {"tipo": "lista", "kicker": "Como funciona", "titulo": "Do cadastro à publicação", "itens": ["Cadastre os itens do plano no publicador", "Revise valores e datas previstas", "Envie ao PNCP com um clique", "Acompanhe o retorno do portal"]},
+  {"tipo": "texto", "kicker": "Época certa", "titulo": "Comece o plano do próximo ano agora", "texto": "Quanto antes o PCA estiver pronto, mais fácil fica alinhar orçamento e calendário de licitações.", "destaque": "Vídeo do passo a passo no link da bio"},
+  {"tipo": "cta", "titulo": "Publicador de PCA da Licita Mais Brasil", "texto": "Peça uma demonstração para o seu órgão.", "url": "licitamaisbrasil.com.br"}
+ ],
+ "legenda": "Seu órgão já está preparando o PCA do próximo ano?\n\nCom o publicador da Licita Mais Brasil, você cadastra os itens, revisa e envia o Plano de Contratações Anual ao PNCP sem planilha paralela (art. 12, VII, da Lei 14.133/2021).\n\nVeja o passo a passo no vídeo do link da bio.\n\n#licitamaisbrasil #licitações #gestãopública #pca",
+ "textoX": "Seu órgão já está montando o PCA do próximo ano? Cadastre, revise e publique o Plano de Contratações Anual no PNCP pela Licita Mais Brasil. Passo a passo: licitamaisbrasil.com.br #PCA",
+ "nota": "Os passos da tela 3 descrevem o fluxo de forma geral; ajuste aos nomes exatos dos botões e acrescente prints reais se quiser."
+},
+{
+ "id": "reedicao-seguranca", "tema": "institucional", "arquivo": "06_Seguranca_Transparencia",
+ "slides": [
+  {"tipo": "capa", "kicker": "Licita Mais Brasil", "titulo": "Segurança e transparência em cada processo", "sub": "Como a plataforma atende órgãos de controle, órgãos e fornecedores."},
+  {"tipo": "lista", "kicker": "Segurança", "titulo": "Rastreável do início ao fim", "itens": ["Protocolos rígidos de acesso", "Registro de cada ato da sessão", "Pronta para fiscalização dos tribunais de contas"]},
+  {"tipo": "lista", "kicker": "Conformidade", "titulo": "Alinhada à Lei 14.133 e à LGPD", "itens": ["Modos de disputa e julgamento automatizados", "Sigilo das propostas até a abertura", "Programa de privacidade e segurança da informação"]},
+  {"tipo": "lista", "kicker": "Transparência", "titulo": "Aberta ao cidadão", "itens": ["Editais e processos sem precisar de login", "Sessões acompanhadas em tempo real", "Cadastro simples para esclarecer ou impugnar"]},
+  {"tipo": "texto", "kicker": "Custos claros", "titulo": "Sem taxa escondida", "texto": "R$ 110 por proposta cadastrada, sem mensalidade, e várias modalidades 100% gratuitas para o fornecedor.", "destaque": "Em processos de órgãos assinantes, o órgão arca com o custo"},
+  {"tipo": "cta", "titulo": "Conheça a plataforma", "texto": "Fale com a nossa equipe ou cadastre-se gratuitamente.", "url": "licitamaisbrasil.com.br"}
+ ],
+ "legenda": "Fiscalização é bem-vinda. Por isso a Licita Mais Brasil foi construída para ser rastreável, transparente e alinhada à Lei 14.133/2021 e à LGPD.\n\nArraste e veja como protegemos os dados, abrimos os processos ao cidadão e mantemos custos claros para o fornecedor.\n\n#licitamaisbrasil #licitações #gestãopública #transparência",
+ "textoX": "Segurança, LGPD e transparência na Licita Mais Brasil: processos abertos ao cidadão sem login, sigilo das propostas até a abertura e custos claros para o fornecedor. licitamaisbrasil.com.br",
+ "nota": "O valor de R$ 110 por proposta vem do post de 20/08/2026; confirme se ainda vale."
+},
+{
+ "id": "reedicao-carona", "tema": "legislacao", "arquivo": "07_Carona_Ata",
+ "slides": [
+  {"tipo": "capa", "kicker": "Legislação · Registro de preços", "titulo": "Vai pegar carona em uma ata?", "sub": "Requisitos, limites e as 4 regras do PNCP."},
+  {"tipo": "lista", "kicker": "Requisitos", "titulo": "Antes de aderir, o órgão precisa", "itens": ["Justificar a vantagem da adesão", "Mostrar que os preços estão compatíveis com o mercado", "Ter a aceitação do gerenciador e do fornecedor"], "destaque": "Art. 86, § 2º, da Lei 14.133/2021"},
+  {"tipo": "lista", "kicker": "Limites", "titulo": "Quanto dá para aderir", "itens": ["Até 50% dos quantitativos de cada item, por órgão", "No total, as adesões não passam do dobro de cada item"], "destaque": "Art. 86, §§ 4º e 5º"},
+  {"tipo": "lista", "kicker": "Quem pode aderir a quem", "titulo": "Regras de esfera", "itens": ["Atas federais, estaduais e distritais: qualquer esfera pode aderir", "Atas municipais: só municípios, e se o registro veio de licitação", "Órgão federal não adere a ata estadual, distrital ou municipal"], "destaque": "Art. 86, §§ 3º e 8º"},
+  {"tipo": "lista", "kicker": "No PNCP", "titulo": "As 4 regras para o contrato ser publicado", "itens": ["O gerenciador publica o processo como registro de preços", "Ao publicar a ata, permite adesão de não participantes", "O gerenciador cadastra o carona como não participante", "O carona publica o contrato assinado"]},
+  {"tipo": "cta", "titulo": "Gerencie atas e adesões em um só lugar", "texto": "Na Licita Mais Brasil, gerenciador e carona fazem cada um a sua parte.", "url": "licitamaisbrasil.com.br"}
+ ],
+ "legenda": "Carona em ata de registro de preços tem requisito, limite e regra de esfera.\n\nPela Lei 14.133/2021 (art. 86), o órgão justifica a vantagem, comprova preço de mercado e precisa do aceite do gerenciador e do fornecedor. Cada órgão adere a até 50% dos quantitativos, e o total de adesões não passa do dobro. No PNCP, a carona depende dos dois órgãos.\n\nSalve e compartilhe com o setor de compras.\n\n#lei14133 #licitações #pncp #registrodepreços",
+ "textoX": "Carona em ata (art. 86, Lei 14.133): justificar vantagem, comprovar preço de mercado e ter aceite do gerenciador e do fornecedor. Limite de 50% por órgão e o dobro no total. Guia completo: licitamaisbrasil.com.br",
+ "nota": "Substitui os posts de 18/06 e 20/10/2026. Arquive o de 20/10 só depois que este sair."
+},
+{
+ "id": "reedicao-mercados-fluidos", "tema": "novidade", "arquivo": "08_Mercados_Fluidos",
+ "slides": [
+  {"tipo": "capa", "kicker": "Credenciamento", "titulo": "Mercados fluidos: preço que acompanha o mercado", "sub": "Como funciona o credenciamento contínuo na Licita Mais Brasil."},
+  {"tipo": "texto", "kicker": "O problema", "titulo": "Preço travado fica defasado", "texto": "Quando o valor oscila o tempo todo, uma licitação tradicional pode ficar velha antes do contrato. A lei prevê o credenciamento para esses casos.", "destaque": "Art. 79, III, da Lei 14.133/2021"},
+  {"tipo": "lista", "kicker": "Como funciona", "titulo": "Passo a passo", "itens": ["O fornecedor se credencia gratuitamente no processo", "Quando o órgão precisa, os credenciados atualizam seus valores", "O sistema ordena as ofertas e mostra a melhor", "O órgão registra a cotação vigente na contratação"]},
+  {"tipo": "texto", "kicker": "Na prática", "titulo": "Teresina já usa", "texto": "A Prefeitura de Teresina fez sua primeira publicação com o credenciamento em mercados fluidos da Licita Mais Brasil.", "destaque": "Tutorial completo em 5 partes no nosso YouTube"},
+  {"tipo": "cta", "titulo": "Leve o credenciamento contínuo ao seu órgão", "texto": "Ou credencie-se como fornecedor sem custo.", "url": "licitamaisbrasil.com.br"}
+ ],
+ "legenda": "Preço que muda toda semana não combina com valor travado.\n\nO credenciamento em mercados fluidos (art. 79, III, da Lei 14.133/2021) permite que fornecedores credenciados atualizem seus valores e que o órgão contrate a melhor oferta vigente. Teresina já usa na Licita Mais Brasil.\n\nArraste para ver o passo a passo. O tutorial completo está no nosso YouTube.\n\n#licitamaisbrasil #licitações #credenciamento #gestãopública",
+ "textoX": "Credenciamento em mercados fluidos (art. 79, III, Lei 14.133): o fornecedor atualiza o preço e o órgão contrata a melhor oferta vigente. Teresina já usa na Licita Mais Brasil. licitamaisbrasil.com.br",
+ "nota": ""
+},
+{
+ "id": "reedicao-desempate", "tema": "novidade", "arquivo": "09_Desempate_Automatico",
+ "slides": [
+  {"tipo": "capa", "kicker": "Novidade na plataforma", "titulo": "Desempate automático, na ordem da lei", "sub": "O sistema conduz cada critério do art. 60."},
+  {"tipo": "texto", "kicker": "Primeiro", "titulo": "Empate ficto para ME e EPP", "texto": "O sistema identifica e aplica a preferência às micro e pequenas empresas, como manda a Lei Complementar 123/2006.", "destaque": "Art. 60, § 2º, da Lei 14.133/2021"},
+  {"tipo": "lista", "kicker": "Critérios do art. 60, nesta ordem", "titulo": "Persistiu o empate?", "itens": ["Disputa final entre os empatados", "Desempenho contratual prévio", "Ações de equidade entre homens e mulheres", "Programa de integridade"]},
+  {"tipo": "lista", "kicker": "Preferências do § 1º", "titulo": "Ainda empatado?", "itens": ["Empresas do estado do órgão", "Empresas brasileiras", "Que investem em pesquisa e tecnologia no país", "Que comprovam práticas de mitigação climática"]},
+  {"tipo": "texto", "kicker": "Último recurso", "titulo": "Sorteio com relatório", "texto": "Se nada desempatar, o sistema faz o sorteio e gera um relatório detalhado do resultado.", "destaque": "Funciona nos modos aberto, aberto-fechado e fechado"},
+  {"tipo": "cta", "titulo": "Veja o desempate na prática", "texto": "Peça uma demonstração para o seu órgão.", "url": "licitamaisbrasil.com.br"}
+ ],
+ "legenda": "Empate em licitação não se resolve só no sorteio.\n\nA Lei 14.133/2021 (art. 60) define a ordem: disputa final, desempenho contratual, equidade entre homens e mulheres e programa de integridade, seguidos das preferências do § 1º. Na Licita Mais Brasil, o sistema conduz cada etapa e registra tudo.\n\nArraste para ver a sequência completa.\n\n#licitamaisbrasil #licitações #lei14133 #pregoeiro",
+ "textoX": "Desempate na Lei 14.133 (art. 60) tem ordem: disputa final, desempenho contratual, equidade de gênero, integridade e as preferências do §1º. A Licita Mais Brasil conduz tudo automaticamente. licitamaisbrasil.com.br",
+ "nota": ""
+},
+{
+ "id": "reedicao-cota-reservada", "tema": "novidade", "arquivo": "10_Cota_Reservada",
+ "slides": [
+  {"tipo": "capa", "kicker": "Novidade na plataforma", "titulo": "Cota reservada deserta? Resolva em um clique", "sub": "Sem perder o item e sem retrabalho."},
+  {"tipo": "texto", "kicker": "O problema", "titulo": "A cota de até 25% pode fracassar", "texto": "A reserva para ME e EPP é obrigatória em bens divisíveis, mas a cota pode ficar deserta ou com preços acima do mercado.", "destaque": "Art. 48, III, da LC 123/2006"},
+  {"tipo": "lista", "kicker": "Como resolvemos", "titulo": "Vínculo inteligente", "itens": ["Indique o vencedor da cota ampla para a cota reservada", "O lance vencedor é copiado automaticamente", "Tudo fica registrado nos relatórios"]},
+  {"tipo": "texto", "kicker": "Equalização", "titulo": "Mesmo fornecedor, preços diferentes?", "texto": "O sistema avisa quando o mesmo fornecedor venceu as duas cotas com valores diferentes, para o pregoeiro pedir o ajuste.", "destaque": "Dica: negocie o valor da cota ampla antes de indicar"},
+  {"tipo": "cta", "titulo": "Menos itens fracassados no seu pregão", "texto": "Conheça a ferramenta na Licita Mais Brasil.", "url": "licitamaisbrasil.com.br"}
+ ],
+ "legenda": "Cota reservada deserta não precisa virar item fracassado.\n\nNa Licita Mais Brasil, o pregoeiro indica o vencedor da cota ampla para assumir a cota reservada, e o sistema copia o lance e registra tudo nos relatórios (art. 48, III, da LC 123/2006).\n\nArraste para ver como funciona.\n\n#licitamaisbrasil #licitações #pregoeiro #gestãopública",
+ "textoX": "Cota reservada deserta? Na Licita Mais Brasil, o pregoeiro indica o vencedor da cota ampla e o sistema copia o lance e registra tudo. Menos itens fracassados. licitamaisbrasil.com.br",
+ "nota": ""
+},
+{
+ "id": "reedicao-pesquisa-precos", "tema": "novidade", "arquivo": "11_Pesquisa_Precos",
+ "slides": [
+  {"tipo": "capa", "kicker": "Novidade na plataforma", "titulo": "Pesquisa de preços em minutos, integrada ao PNCP", "sub": "Do levantamento ao relatório pronto."},
+  {"tipo": "lista", "kicker": "O que a norma pede", "titulo": "Uma pesquisa válida tem", "itens": ["Descrição clara do objeto", "Fontes consultadas e série de preços", "Método estatístico e justificativas", "Memória de cálculo"], "destaque": "IN SEGES/ME 65/2021"},
+  {"tipo": "lista", "kicker": "Método", "titulo": "Como chegar ao valor estimado", "itens": ["Média, mediana ou menor dos valores", "Com pelo menos 3 preços", "Menos de 3 só com justificativa aprovada"]},
+  {"tipo": "lista", "kicker": "Na Licita Mais Brasil", "titulo": "A ferramenta faz por você", "itens": ["Busca no PNCP com filtro por região e modalidade", "Destaque do objeto e conferência do valor homologado", "Inclusão de cotações externas", "Relatório em Word com média, mediana e links"]},
+  {"tipo": "texto", "kicker": "Para o órgão", "titulo": "Acesso livre para órgãos cadastrados", "texto": "E você pode cadastrar usuários só da fase de planejamento, para descentralizar a tarefa."},
+  {"tipo": "cta", "titulo": "Veja a pesquisa de preços na prática", "texto": "Agende uma demonstração gratuita.", "url": "licitamaisbrasil.com.br"}
+ ],
+ "legenda": "Pesquisa de preços não precisa levar dias.\n\nA IN SEGES/ME 65/2021 pede objeto claro, fontes, método estatístico e memória de cálculo. Na Licita Mais Brasil, a ferramenta busca no PNCP, filtra por região e modalidade e entrega o relatório em Word com média e mediana.\n\nArraste para ver o passo a passo.\n\n#licitamaisbrasil #licitações #pncp #gestãopública",
+ "textoX": "Pesquisa de preços conforme a IN 65/2021, com busca no PNCP, filtro por região e relatório em Word com média e mediana. Livre para órgãos cadastrados na Licita Mais Brasil. licitamaisbrasil.com.br",
+ "nota": "Substitui 3 posts (26/11/2025, 03/12/2025 e 11/06/2026)."
+},
+{
+ "id": "reedicao-comecar-gratis", "tema": "institucional", "arquivo": "12_Comece_Gratis",
+ "slides": [
+  {"tipo": "capa", "kicker": "Para fornecedores", "titulo": "Comece nas licitações sem gastar nada", "sub": "Processos 100% gratuitos para você participar."},
+  {"tipo": "lista", "kicker": "Onde é gratuito", "titulo": "Participe sem pagar em", "itens": ["Dispensa sem lances", "Credenciamento", "Pré-qualificação", "Processos de órgãos assinantes da plataforma"]},
+  {"tipo": "texto", "kicker": "Por que é gratuito", "titulo": "Quem publica, paga", "texto": "Nos órgãos assinantes, o custo da operação fica com o órgão. Para você, sem taxa e sem mensalidade para concorrer."},
+  {"tipo": "lista", "kicker": "Prepare-se", "titulo": "4 passos antes de participar", "itens": ["Leia o edital com atenção", "Confira as exigências de habilitação", "Deixe as certidões dentro da validade", "Tire dúvidas antes do prazo"]},
+  {"tipo": "cta", "titulo": "Sua primeira licitação pode começar hoje", "texto": "Cadastre-se gratuitamente como fornecedor.", "url": "licitamaisbrasil.com.br"}
+ ],
+ "legenda": "Dá para começar nas licitações sem gastar nada.\n\nNa Licita Mais Brasil, você participa de graça de dispensas sem lances, credenciamentos, pré-qualificações e dos processos de órgãos assinantes. Participar é gratuito; se destacar exige preparo, e o carrossel traz 4 passos para isso.\n\nCadastre-se em licitamaisbrasil.com.br.\n\n#licitações #fornecedores #oportunidade #licitamaisbrasil",
+ "textoX": "Quer vender para o governo sem custo para começar? Na Licita Mais Brasil, dispensas sem lances, credenciamentos e pré-qualificações são gratuitos para o fornecedor. Cadastre-se: licitamaisbrasil.com.br",
+ "nota": "Sugestão: fixar no topo do perfil."
+},
+{
+ "id": "reedicao-fase-interna", "tema": "novidade", "arquivo": "13_Fase_Interna",
+ "slides": [
+  {"tipo": "capa", "kicker": "Gestão integral", "titulo": "Da demanda ao contrato num só sistema", "sub": "A fase preparatória da Lei 14.133 sem papel espalhado."},
+  {"tipo": "texto", "kicker": "Planejamento", "titulo": "DFD, ETP e matriz de riscos", "texto": "Documentos da fase preparatória organizados num só fluxo, com apoio de inteligência artificial para refinar DFD e ETP.", "destaque": "Art. 18 da Lei 14.133/2021"},
+  {"tipo": "texto", "kicker": "Elaboração", "titulo": "Termo de referência, edital e orçamento", "texto": "Modelos personalizados para a necessidade do seu órgão, gerados a partir do que já foi planejado."},
+  {"tipo": "texto", "kicker": "Gestão", "titulo": "Atas, contratos e assinaturas", "texto": "Vigência, aditamentos e assinatura eletrônica integrada, sem imprimir nada."},
+  {"tipo": "texto", "kicker": "Publicidade", "titulo": "Integração direta com o PNCP", "texto": "Publicação no portal sem retrabalho, com histórico rastreável para auditoria."},
+  {"tipo": "cta", "titulo": "Veja a gestão integral funcionando", "texto": "Solicite uma demonstração gratuita.", "url": "licitamaisbrasil.com.br"}
+ ],
+ "legenda": "Processo espalhado em vários sistemas é risco jurídico.\n\nA Licita Mais Brasil reúne planejamento (DFD, ETP e riscos), elaboração (TR e edital), gestão (atas, contratos e assinaturas) e publicação no PNCP num só lugar, alinhado à fase preparatória da Lei 14.133/2021 (art. 18).\n\nArraste para ver cada etapa.\n\n#licitamaisbrasil #licitações #gestãopública #lei14133",
+ "textoX": "Da demanda ao contrato num só sistema: DFD, ETP, TR, edital, contratos, assinatura e PNCP na Licita Mais Brasil, com IA para refinar DFD e ETP. licitamaisbrasil.com.br",
+ "nota": "Substitui 4 posts (13/02, 09/03, 16/03 e 26/06/2026)."
+},
+{
+ "id": "reedicao-duvidas-fases", "tema": "legislacao", "arquivo": "14_Duvidas_Fases",
+ "slides": [
+  {"tipo": "capa", "kicker": "Legislação e dicas", "titulo": "5 dúvidas sobre as fases da licitação", "sub": "Respostas diretas da Lei 14.133/2021."},
+  {"tipo": "texto", "kicker": "Dúvida 1", "titulo": "Qual é a ordem das fases?", "texto": "Preparatória, divulgação do edital, propostas e lances, julgamento, habilitação, recursal e homologação.", "destaque": "Art. 17"},
+  {"tipo": "texto", "kicker": "Dúvida 2", "titulo": "A habilitação pode vir antes?", "texto": "Pode, por ato motivado que explique os benefícios e desde que o edital preveja a inversão.", "destaque": "Art. 17, § 1º"},
+  {"tipo": "texto", "kicker": "Dúvida 3", "titulo": "Todos enviam documentos de habilitação?", "texto": "Não. Só o licitante vencedor, salvo quando a habilitação vem antes do julgamento.", "destaque": "Art. 63, II"},
+  {"tipo": "texto", "kicker": "Dúvida 4", "titulo": "Quando manifestar a intenção de recorrer?", "texto": "Imediatamente, sob pena de preclusão. As razões vêm em 3 dias úteis.", "destaque": "Art. 165, § 1º, I"},
+  {"tipo": "texto", "kicker": "Dúvida 5", "titulo": "Até quando posso impugnar o edital?", "texto": "Até 3 dias úteis antes da abertura do certame. Qualquer pessoa pode impugnar ou pedir esclarecimento.", "destaque": "Art. 164"},
+  {"tipo": "cta", "titulo": "Na Licita Mais Brasil, o sistema segue esse rito", "texto": "Salve este post para consultar durante o pregão.", "url": "licitamaisbrasil.com.br"}
+ ],
+ "legenda": "5 dúvidas que aparecem em quase todo pregão, com a resposta da Lei 14.133/2021: ordem das fases, inversão da habilitação, quem envia documentos, quando recorrer e o prazo para impugnar.\n\nSalve para consultar e envie para quem está começando no setor de compras.\n\n#lei14133 #licitações #pncp #pregoeiro",
+ "textoX": "Lei 14.133: só o vencedor envia habilitação (art. 63, II), a intenção de recorrer é imediata (art. 165) e impugnar o edital vai até 3 dias úteis antes da abertura (art. 164). Mais: licitamaisbrasil.com.br",
+ "nota": "As 5 perguntas foram reescritas a partir da lei, porque o texto das telas do post original não estava disponível."
+},
+{
+ "id": "reedicao-dialogo-competitivo", "tema": "legislacao", "arquivo": "15_Dialogo_Competitivo",
+ "slides": [
+  {"tipo": "capa", "kicker": "Legislação e dicas", "titulo": "Diálogo competitivo em 3 fases", "sub": "Quando usar e como conduzir."},
+  {"tipo": "lista", "kicker": "Quando usar", "titulo": "O objeto envolve", "itens": ["Inovação tecnológica ou técnica", "Necessidade que o mercado não atende sem adaptação", "Especificação que a Administração não consegue definir com precisão"], "destaque": "Art. 32, I"},
+  {"tipo": "texto", "kicker": "Fase 1 · Pré-seleção", "titulo": "Edital com as necessidades", "texto": "A Administração divulga necessidades e exigências e abre prazo mínimo de 25 dias úteis para manifestação de interesse.", "destaque": "Art. 32, § 1º, I"},
+  {"tipo": "texto", "kicker": "Fase 2 · Diálogo", "titulo": "Conversa com os pré-selecionados", "texto": "Reuniões registradas em ata e gravadas, sem revelar soluções de um licitante aos outros sem consentimento."},
+  {"tipo": "texto", "kicker": "Fase 3 · Competitiva", "titulo": "Propostas sobre a solução escolhida", "texto": "Novo edital com a solução definida e prazo mínimo de 60 dias úteis para as propostas.", "destaque": "Art. 32, § 1º, VIII"},
+  {"tipo": "texto", "kicker": "Quem conduz", "titulo": "Comissão de pelo menos 3 servidores", "texto": "Servidores efetivos ou empregados públicos dos quadros permanentes, com assessoria técnica contratada se preciso.", "destaque": "Art. 32, § 1º, XI"},
+  {"tipo": "cta", "titulo": "Modalidades da Lei 14.133 explicadas", "texto": "Siga o perfil e salve este post.", "url": "licitamaisbrasil.com.br"}
+ ],
+ "legenda": "Diálogo competitivo é a modalidade para quando o órgão sabe o problema, mas não a solução.\n\nPela Lei 14.133/2021 (art. 32): pré-seleção com prazo mínimo de 25 dias úteis, diálogo gravado com os pré-selecionados e fase competitiva com pelo menos 60 dias úteis para as propostas, conduzida por comissão de no mínimo 3 servidores.\n\nArraste e salve.\n\n#lei14133 #licitações #gestãopública #pncp",
+ "textoX": "Diálogo competitivo (art. 32, Lei 14.133): pré-seleção com 25 dias úteis, diálogo gravado e fase competitiva com 60 dias úteis para propostas. Comissão de ao menos 3 servidores. licitamaisbrasil.com.br",
+ "nota": ""
+},
+{
+ "id": "reedicao-tecnica-preco", "tema": "novidade", "arquivo": "16_Tecnica_Preco",
+ "slides": [
+  {"tipo": "capa", "kicker": "Novidade na plataforma", "titulo": "Técnica e preço sem planilha", "sub": "O sistema faz a ponderação definida no edital."},
+  {"tipo": "texto", "kicker": "A regra", "titulo": "Técnica vale no máximo 70%", "texto": "As propostas técnicas e de preço são avaliadas e ponderadas, com até 70% de peso para a técnica.", "destaque": "Art. 36, § 2º, da Lei 14.133/2021"},
+  {"tipo": "lista", "kicker": "No sistema", "titulo": "Cálculo automático", "itens": ["Identifica o menor preço e calcula a nota de preço de todos", "Aplica os pesos de técnica e preço do edital", "Gera a nota final e a classificação"]},
+  {"tipo": "texto", "kicker": "Resultado", "titulo": "Menos erro, menos recurso", "texto": "Critérios matemáticos claros e registrados reduzem questionamentos e aceleram o julgamento."},
+  {"tipo": "cta", "titulo": "Veja o julgamento em ação", "texto": "Agende uma demonstração para a sua comissão.", "url": "licitamaisbrasil.com.br"}
+ ],
+ "legenda": "Julgamento por técnica e preço sem planilha manual.\n\nA Lei 14.133/2021 limita a técnica a 70% do peso (art. 36, § 2º). Na Licita Mais Brasil, o sistema calcula a nota de preço, aplica os pesos do edital e gera a classificação final.\n\nArraste para ver como funciona.\n\n#licitamaisbrasil #licitações #lei14133 #gestãopública",
+ "textoX": "Técnica e preço sem planilha: a Licita Mais Brasil calcula a nota de preço, aplica os pesos do edital (técnica até 70%, art. 36, Lei 14.133) e gera a classificação. licitamaisbrasil.com.br",
+ "nota": ""
+},
+{
+ "id": "reedicao-assinatura-digital", "tema": "novidade", "arquivo": "17_Assinatura_Digital",
+ "slides": [
+  {"tipo": "capa", "kicker": "Novidade na plataforma", "titulo": "Assine os relatórios sem sair do sistema", "sub": "Assinatura digital integrada, com a tecnologia da Autentique."},
+  {"tipo": "lista", "kicker": "O que dá para assinar", "titulo": "Documentos do processo", "itens": ["Atas", "Relatório de disputa", "Termos de adjudicação e homologação", "Outros arquivos do processo"]},
+  {"tipo": "lista", "kicker": "Vantagens", "titulo": "Menos papel, mais agilidade", "itens": ["Assinaturas em minutos, de qualquer lugar", "Registro de quem assinou e quando", "Sem impressão e sem arquivo físico"], "destaque": "Validade jurídica: Lei 14.063/2020"},
+  {"tipo": "cta", "titulo": "Experimente na Licita Mais Brasil", "texto": "Assinatura digital já disponível para órgãos.", "url": "licitamaisbrasil.com.br"}
+ ],
+ "legenda": "Chega de imprimir, assinar à mão e arquivar papel.\n\nAtas, relatório de disputa e termos de adjudicação e homologação agora são assinados dentro da Licita Mais Brasil, com a tecnologia da Autentique e validade jurídica (Lei 14.063/2020).\n\n#licitamaisbrasil #licitações #gestãopública #assinaturadigital",
+ "textoX": "Assine atas, relatório de disputa e termos de homologação sem sair da Licita Mais Brasil. Assinatura digital integrada com a Autentique e validade jurídica (Lei 14.063/2020). licitamaisbrasil.com.br",
+ "nota": ""
+},
+{
+ "id": "reedicao-fluxograma", "tema": "institucional", "arquivo": "18_Fluxograma",
+ "slides": [
+  {"tipo": "capa", "kicker": "Material gratuito", "titulo": "Fluxograma de todas as modalidades", "sub": "As fases da Lei 14.133 numa só imagem."},
+  {"tipo": "lista", "kicker": "O que você ganha", "titulo": "Para consultar no dia a dia", "itens": ["Clareza: o processo inteiro de relance", "Segurança: o passo a passo correto", "Foco: menos dúvida, mais resultado"]},
+  {"tipo": "cta", "titulo": "Baixe o fluxograma", "texto": "Link na bio do nosso perfil.", "url": "licitamaisbrasil.com.br"}
+ ],
+ "legenda": "Licitar fica mais fácil quando dá para ver o caminho inteiro.\n\nPreparamos um fluxograma com as fases de cada modalidade da Lei 14.133/2021. É gratuito: baixe pelo link da bio e salve no computador do setor de compras.\n\n#lei14133 #licitações #gestãopública #licitamaisbrasil",
+ "textoX": "Baixe grátis o fluxograma com as fases de todas as modalidades da Lei 14.133, feito pela Licita Mais Brasil: licitamaisbrasil.com.br #licitações",
+ "nota": "Confirme o link de download antes de publicar; no LinkedIn, suba o PDF como documento."
+}
+]
