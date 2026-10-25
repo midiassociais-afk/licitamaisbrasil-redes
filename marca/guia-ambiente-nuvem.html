@@ -145,9 +145,9 @@ a{color:var(--azul-t)}
     <li class="passo">
       <div class="txt">
         <h2>Abra a edição do ambiente Default</h2>
-        <p>Clique no seletor de <b>ambiente</b>, que mostra "Default" e um ícone de nuvem.</p>
-        <p>Passe o mouse sobre <b>Default</b> e clique no ícone de <b>engrenagem</b> (ou em <b>Editar</b>) ao lado.</p>
-        <p class="se">Se aparecer só <b>Adicionar ambiente</b>, use essa opção e dê o nome <span class="mono">licitamaisbrasil</span>. O resultado é o mesmo.</p>
+        <p><b>Atalho mais fácil:</b> abra a <a href="https://claude.ai/code/session_019DgYDiyEC87q6Urtj9zTGi" target="_blank" rel="noopener">sessão do teste de renderização</a>, clique na <b>setinha (˅) ao lado do título</b>, no topo, e escolha <b>Edit cloud environment</b>. Pule para o passo 5.</p>
+        <p><b>Ou pela tela de nova sessão:</b> clique no <b>primeiro controle da linha abaixo da caixa de mensagem</b> (o seletor de ambiente). Sob <b>Cloud</b>, clique na linha para abrir a lista; se "Default" não aparecer, clique em <b>More</b>. Passe o mouse sobre <b>Default</b> e clique no <b>ícone de configurações</b> que aparece à direita.</p>
+        <p class="se">O seletor só aparece antes de você enviar a primeira mensagem de uma sessão nova.</p>
       </div>
       <div>
         <div class="tela" aria-hidden="true">
@@ -165,9 +165,9 @@ a{color:var(--azul-t)}
       <div class="txt">
         <h2>Preencha a configuração</h2>
         <ul>
-          <li><b>Acesso à rede:</b> escolha <b>Full</b> (acesso total). A tarefa consulta sites do TCU, do Planalto e de outros órgãos, e baixa o navegador que gera as artes.</li>
-          <li><b>Variáveis de ambiente:</b> deixe em branco.</li>
-          <li><b>Script de configuração:</b> copie e cole exatamente a linha abaixo.</li>
+          <li>No diálogo, clique na linha <b>Network access</b> e escolha <b>Full</b>. É a única mudança obrigatória: a tarefa consulta a API da plataforma e sites do TCU, do Planalto e de outros órgãos.</li>
+          <li><b>Environment variables:</b> deixe em branco.</li>
+          <li><b>Setup script</b> (opcional, a tarefa já instala o que precisa): pode colar a linha abaixo.</li>
         </ul>
         <div class="copiar">
           <pre id="script">cd marca/render &amp;&amp; npm ci &amp;&amp; npx playwright install --with-deps chromium</pre>
@@ -191,7 +191,7 @@ a{color:var(--azul-t)}
     <li class="passo">
       <div class="txt">
         <h2>Salve e me avise</h2>
-        <p>Clique em <b>Salvar</b>. Não precisa iniciar nenhuma tarefa nessa tela.</p>
+        <p>Clique em <b>Save changes</b>. Não precisa iniciar nenhuma tarefa nessa tela. Reabra o diálogo e confira se Network access continua como <b>Full</b>.</p>
         <p>Depois, volte à conversa comigo e escreva <b>"Default configurado"</b>. Daí eu:</p>
         <ul>
           <li>crio a tarefa diária na nuvem, às 6h07, horário de Brasília;</li>
