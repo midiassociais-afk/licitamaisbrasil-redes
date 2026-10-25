@@ -26,7 +26,7 @@ Documento da pauta (gravar POR ÚLTIMO): {id: "<dia>", resumo: "2–3 frases", f
 Grave com ArtifactData `batch` (até 50 escritas). Documentos novos não levam if_version.
 
 ## Passo 0 — Preparação
-1. Calcule `dia` (hoje, horário de Brasília) e o dia da semana.
+1. Calcule `dia` (hoje, horário de Brasília) e o dia da semana. Se for sábado ou domingo, faça apenas o Passo 6 (ajustes) e termine.
 2. ArtifactData `get` em `pautas`/`<dia>`. Se já existir, vá direto ao Passo 6 e termine.
 3. ArtifactData `query` em `itens` com where dia >= (hoje − 45 dias), limit 1000. Monte a lista de chaves usadas, incluindo todas as `chavesExtras`. Nunca repita uma chave.
 Redes: Instagram, Facebook, LinkedIn, YouTube e X. Inclua "X" em formatos de todo item de jurisprudência, notícia, legislação, novidade, institucional e no carrossel de oportunidades.
@@ -58,10 +58,10 @@ WebFetch em https://portal.tcu.gov.br/imprensa/noticias pedindo as notícias dos
 ### 1D — Jurisprudência Selecionada e Súmulas (reserva para quinta)
 Se a quinta não tiver um bom "Você sabia?", use https://pesquisa.apps.tcu.gov.br/pesquisa/jurisprudencia-selecionada ou https://pesquisa.apps.tcu.gov.br/pesquisa/sumula (WebFetch) para escolher um entendimento consolidado sobre licitações. Crie 1 carrossel `legislacao`, `chave:"tcu-js-<slug>"`, citando o número do enunciado ou da súmula exatamente como aparece. Não repita chaves dos últimos 45 dias.
 
-## Passo 2 — Oportunidades da plataforma
-`node automacao/coleta.mjs oportunidades > /tmp/lmb/oport.json` (já traz modalidade traduzida, abertura em Brasília e link; a janela é de 30 h, ou 72 h às segundas).
-Descarte as de chave já usada. Escolha de 3 a 8, variando estado e modalidade e preferindo objetos claros e de interesse amplo. Com menos de 3, não crie nada (ficam para o dia seguinte). Crie UM item `oportunidade`, `chave:"oport-<dia>"`, `chavesExtras` com as `auc-<id>` incluídas, formatos ["Carrossel","Story","X","LinkedIn"], prioridade 4:
-- titulo: "<N> novas oportunidades na Licita Mais Brasil"
+## Passo 2 — Oportunidades da plataforma (somente às quartas)
+Faça este passo só às quartas. Ele reúne as oportunidades da semana num único carrossel: `node automacao/coleta.mjs oportunidades 168 > /tmp/lmb/oport.json` (já traz modalidade traduzida, abertura em Brasília e link; 168 h = 7 dias; só entram processos com abertura futura).
+Descarte as de chave já usada. Escolha de 3 a 8, variando estado e modalidade e preferindo objetos claros e de interesse amplo. Com menos de 3, não crie nada (ficam para o dia seguinte). Crie UM item `oportunidade`, `chave:"oport-<dia>"`, `chavesExtras` com as `auc-<id>` incluídas, formatos ["Carrossel","X","LinkedIn"], prioridade 5:
+- titulo: "<N> oportunidades abertas nesta semana"
 - slides: capa ("<N> novas oportunidades · <estados>"), uma tela por oportunidade ("Modalidade · objeto curto · Cidade/UF · abertura") e a tela final ("Participe pela Licita Mais Brasil · licitamaisbrasil.com.br/editais")
 - roteiro: lista numerada com o objeto completo de cada uma
 - legenda: abertura convidando fornecedores, uma linha "• UF – objeto curto – abertura dd/mm" por oportunidade e o CTA para o link da bio
@@ -77,7 +77,16 @@ WebSearch (modo standard) sobre as últimas 48 h, por exemplo: "licitações not
 
 ## Passo 5 — Dica perene
 De segunda a sexta, se não houver item `legislacao` hoje, crie 1 carrossel de dica prática sobre a Lei 14.133/2021 ou o PNCP, ligado ao momento do ano (PCA, fim do exercício, adesão a ata, credenciamento), `chave:"dica-<slug>"` não usada em 45 dias. Confirme o artigo abrindo https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14133.htm com WebFetch (o site do Planalto recusa curl a partir da nuvem) e coloque esse link nas fontes.
-Calendário: segunda = legislação e dicas; terça = jurisprudência do TCU (Boletim e, nas semanas em que sai, o Informativo); quarta = novidade da plataforma; quinta = "Você sabia?"; sexta = resumo da semana. Sábado e domingo: só oportunidades, notícias do TCU e ajustes. A linha do dia recebe prioridade 5. Na sexta, crie também 1 item `noticia`, `chave:"resumo-<dia>"`, formatos ["Carrossel","LinkedIn","X"], com 3–5 destaques da semana.
+## Cronograma de publicação (uma publicação por dia útil)
+| Dia | Linha (`linha`) | Tema |
+|---|---|---|
+| Segunda | legislacao | Legislação e dicas |
+| Terça | jurisprudencia | Jurisprudência do TCU (Boletim ou Informativo) |
+| Quarta | oportunidade | Oportunidades da semana |
+| Quinta | novidade | Novidade da plataforma; sem novidade, um "Você sabia?" (legislacao) |
+| Sexta | noticia | Destaque da semana: a melhor notícia do setor ou do TCU |
+Horários (fixos, pelo pico de público medido no Metricool): LinkedIn e X às 11h; Instagram e Facebook às 18h30. Sábado e domingo não há publicação: nesses dias a tarefa faz apenas o Passo 6 (ajustes) e termina, sem criar itens nem documento de pauta.
+A linha do dia recebe prioridade 5. Na sexta, o item de destaque pode ser `noticia` de um dos Passos 1C ou 4; se não houver nada bom, não crie item (o Passo 8 encaixa uma reedição). A linha do dia recebe prioridade 5. Na sexta, crie também 1 item `noticia`, `chave:"resumo-<dia>"`, formatos ["Carrossel","LinkedIn","X"], com 3–5 destaques da semana.
 
 ## Passo 6 — Ajustes pedidos pela equipe
 Query em `itens` com where status == "ajustar". Para cada item com `comentario` não vazio: reescreva conforme o pedido, mantendo fontes reais, e faça update com if_version: campos reescritos, status "pendente", comentarioAtendido = comentário original, comentario = "", geradoEm = agora. Se o item tinha `imagens`, refaça as artes no Passo 7. Se não der para atender, mantenha "ajustar" e escreva em comentario "Não foi possível atender: <motivo>".
@@ -96,12 +105,20 @@ Query em `itens` com where status == "ajustar". Para cada item com `comentario` 
 5. ArtifactData batch `update` em cada item (if_version da gravação) com `imagens: ["pautas/<dia>/<doc_id>/01.png", …]` e `imagensPublicas: ["https://raw.githubusercontent.com/midiassociais-afk/licitamaisbrasil-redes/main/marca/saida/pautas/<dia>/<doc_id>/01.png", …]`.
 Se algo falhar, siga sem imagens e registre {nome:"Artes", ok:false, nota:"<erro>"} nas fontes da pauta.
 
+## Passo 8 — Encaixe no cronograma
+Cada item tem o campo `dataPublicacao` ("YYYY-MM-DD", sempre um dia útil) ou nenhum. A Central mostra a semana a partir dele.
+1. ArtifactData `query` em `itens` com where dataPublicacao >= hoje e dataPublicacao <= hoje + 7 dias. Um dia útil está ocupado se já tem item com status diferente de "descartado".
+2. Para cada item novo de hoje (e os reescritos no Passo 6 que estavam sem data), escolha o próximo dia útil livre, a partir de hoje (a tarefa roda às 6h07, antes dos horários de publicação, e a equipe aprova pela manhã), cuja linha no cronograma seja igual à `linha` do item. A notícia de sexta vai para a sexta. Itens que não couberem em nenhum dia livre dos próximos 7 dias ficam sem `dataPublicacao`, para a equipe encaixar na Central.
+3. Para cada dia útil dos próximos 5 que continuar livre depois disso, encaixe uma reedição já aprovada (`dia:"reedicao"`, `status:"aprovado"`, sem `dataPublicacao`), dando preferência à mesma linha do dia e à maior prioridade. Não encaixe itens pendentes de outros dias por conta própria.
+4. Grave com ArtifactData batch `update` (com if_version) só o campo `dataPublicacao`. Nunca mude a data de um item já aprovado e com data.
+No relatório final, diga quais dias da próxima semana ficaram sem post.
+
 ## Regras de conteúdo
 - Voz da marca: tecnologia com confiança. Frases curtas, voz ativa, "você" e "seu órgão". Benefício antes do recurso. No máximo 2 emojis por legenda. Sem caixa alta corrida e sem superlativos vazios.
 - No texto, escreva "Licita Mais Brasil" por extenso; nunca "Licita+Brasil".
 - Hashtags: jurisprudencia → #jurisprudenciatcu #licitações #lei14133 #pregoeiro; oportunidade → #licitações #oportunidade #fornecedores; novidade → #licitamaisbrasil #licitações #gestãopública; legislacao → #lei14133 #licitações #pncp; noticia → #licitações #comprasPúblicas.
 - Não invente fatos, números, datas, valores ou citações. Na dúvida, deixe o tema de fora. Não opine sobre decisões do TCU além do enunciado, e avise que o enunciado do Boletim não é resumo oficial.
-- Total do dia: 3 a 8 itens (o carrossel de oportunidades conta como 1).
+- Publicamos uma vez por dia útil, então gere poucas sugestões, mas boas: de 1 a 4 itens por dia (o carrossel de oportunidades conta como 1). Prefira um item forte da linha do dia a vários itens medianos.
 
 ## Fim
-Ordem: itens → artes (Passo 7) → documento da pauta. Nas `fontes` da pauta, registre "TCU – Boletim", "Oportunidades (API)", "Notícias da plataforma", "Busca na web", "Lei 14.133 (Planalto)" e "Artes", cada uma com ok e nota curta. Termine com um relatório de 3 linhas: itens por linha editorial, fontes que falharam e o link da Central.
+Ordem: itens → artes (Passo 7) → encaixe no cronograma (Passo 8) → documento da pauta. Nas `fontes` da pauta, registre "TCU – Boletim", "Oportunidades (API)", "Notícias da plataforma", "Busca na web", "Lei 14.133 (Planalto)" e "Artes", cada uma com ok e nota curta. Termine com um relatório de 3 linhas: itens por linha editorial, fontes que falharam e o link da Central.

@@ -129,6 +129,28 @@ textarea{width:100%;min-height:110px;font:14px/1.5 var(--f-txt);color:var(--fg);
 .check input{width:20px;height:20px;accent-color:#21B24D}
 ol.passos{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14px;color:var(--muted)}
 .arq{font-size:12.5px;color:var(--muted);font-family:ui-monospace,Consolas,monospace;overflow-wrap:anywhere}
+/* ===== semana ===== */
+.semana{display:grid;gap:16px}
+.semnav{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.semnav h3{font-size:17px}
+.dias5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+@media (max-width:980px){.dias5{grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}}
+.slot{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:grid;grid-template-rows:auto 1fr;min-width:0}
+.slot.hoje{border-color:var(--accent2);box-shadow:0 0 0 1px var(--accent2)}
+.slot .topo{padding:10px 12px;border-bottom:4px solid var(--c,#999);display:grid;gap:2px}
+.slot .topo b{font:700 14px var(--f-tit);text-transform:capitalize}
+.slot .topo span{font-size:12px;color:var(--muted)}
+.slot .conteudo{padding:12px;display:grid;gap:8px;align-content:start;min-width:0}
+.thumb{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:8px;background:var(--bg);display:block}
+.thumbph{aspect-ratio:4/5;border-radius:8px;background:var(--c,#28323B);color:#fff;display:grid;place-content:center;padding:12px;font:700 14px/1.2 var(--f-tit);text-align:center}
+.slot h4{font:600 14px/1.3 var(--f-tit);margin:0;overflow-wrap:anywhere}
+.vazio{border:1px dashed var(--line);border-radius:8px;padding:14px;color:var(--muted);font-size:13px;display:grid;gap:8px}
+select{font:13px var(--f-txt);color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 8px;width:100%;max-width:100%}
+.btn.mini{padding:5px 10px;font-size:12.5px}
+.crono{display:grid;gap:4px;font-size:13.5px}
+.crono .lin{display:grid;grid-template-columns:90px 1fr;gap:8px}
+.crono .lin b{font-family:var(--f-tit);font-weight:600}
+.agenda{font-size:13px;font-weight:600;color:var(--accent2)}
 </style>
 
 <header>
@@ -162,6 +184,15 @@ const LINHAS={
   noticia:{nome:'Notícias do setor',cor:'#03A2E4'}
 };
 const STATUS={pendente:'Pendente',aprovado:'Aprovado',ajustar:'Ajustar',descartado:'Descartado'};
+// Cronograma: uma publicação por dia útil. Horários pelo pico de público medido no Metricool (out/2026).
+const CRONOGRAMA=[
+  {dia:1,nome:'segunda',linha:'legislacao',tema:'Legislação e dicas'},
+  {dia:2,nome:'terça',linha:'jurisprudencia',tema:'Jurisprudência do TCU'},
+  {dia:3,nome:'quarta',linha:'oportunidade',tema:'Oportunidades da semana'},
+  {dia:4,nome:'quinta',linha:'novidade',tema:'Novidade da plataforma ou "Você sabia?"'},
+  {dia:5,nome:'sexta',linha:'noticia',tema:'Destaque da semana'}
+];
+const HORARIOS='LinkedIn e X às 11h · Instagram e Facebook às 18h30';
 const AVATAR='logos/simbolo_colorido.png';
 const KIT=[
   {rede:'instagram',nome:'Instagram',arquivos:['Perfil_Todas_as_Redes_1080x1080.png'],destaques:true,passos:['No app, abra o perfil e toque em Editar perfil › Editar foto.','Envie Perfil_Todas_as_Redes_1080x1080.png.','Para cada destaque: toque e segure › Editar destaque › Editar capa › escolha o arquivo Destaque_….png correspondente.','Crie o destaque "Oportunidades" com a capa Destaque_Oportunidades.png.']},
@@ -174,8 +205,12 @@ const DESTAQUES=[['Jurisprudência','Destaque_Jurisprudencia.png'],['Legislaçã
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const fmtDia=d=>{if(d==='reedicao')return'Reedição';if(d==='identidade')return'Identidade';if(!/^\d{4}-\d{2}-\d{2}$/.test(d))return d;const[y,m,dd]=d.split('-');return new Date(+y,+m-1,+dd).toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})};
+const fmtDia=d=>{if(d==='semana')return'Semana';if(d==='reedicao')return'Reedição';if(d==='identidade')return'Identidade';if(!/^\d{4}-\d{2}-\d{2}$/.test(d))return d;const[y,m,dd]=d.split('-');return new Date(+y,+m-1,+dd).toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})};
 let db=null,me=null,canWrite=true,dia=null,pautas=[],itens=[],kitDocs={},unsubItens=null;
+let semanaIni=segundaDe(new Date()),semanaItens=[],pool=[],unsubSemana=[],irPara=null;
+function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function segundaDe(d){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());const w=x.getDay();x.setDate(x.getDate()+(w===0?1:w===6?2:1-w));return x}
+function diasDaSemana(){return CRONOGRAMA.map((c,k)=>{const d=new Date(semanaIni);d.setDate(d.getDate()+k);return{...c,data:iso(d),obj:d}})}
 const filtro=new Set(['pendente','ajustar','aprovado']);
 const prevState={};   // por item: {net, slide}
 const erros={};       // por item: última mensagem de erro de gravação
@@ -186,10 +221,15 @@ const msgErro=e=>{const c=e&&e.code;return c==='invalid_argument'?'O servidor re
 /* ---------- topo e resumo ---------- */
 function renderDays(){
   const box=$('days');box.innerHTML='';
-  [...pautas.map(p=>p.id),'identidade'].forEach(id=>{const b=document.createElement('button');b.className='day';b.textContent=fmtDia(id);
+  ['semana',...pautas.map(p=>p.id),'identidade'].forEach(id=>{const b=document.createElement('button');b.className='day';b.textContent=fmtDia(id);
     b.setAttribute('aria-pressed',id===dia?'true':'false');b.onclick=()=>selectDia(id);box.appendChild(b)});
 }
 function renderSummary(){
+  if(dia==='semana'){$('sumTitle').textContent='Cronograma da semana';
+    $('sumText').textContent='Uma publicação por dia, de segunda a sexta, a mesma em todas as redes. '+HORARIOS+'. Encaixe uma sugestão em cada dia e aprove; o que estiver aprovado no dia é o que sai.';
+    const ds=diasDaSemana();const aprov=ds.filter(d=>semanaItens.some(i=>i.dataPublicacao===d.data&&i.status==='aprovado')).length;const ocup=ds.filter(d=>semanaItens.some(i=>i.dataPublicacao===d.data)).length;
+    $('counts').innerHTML=`<span class="pill ${aprov===5?'st-aprovado':'st-pendente'}">${aprov} de 5 dias aprovados</span><span class="pill st-pendente">${5-ocup} dia(s) sem post</span><span class="pill st-ajustar">${pool.length} sugestão(ões) sem dia</span>`;
+    $('fontes').innerHTML='';$('filters').hidden=true;return}
   if(dia==='identidade'){$('sumTitle').textContent='Identidade visual das redes';
     $('sumText').textContent='Foto de perfil, capas e capas de destaques no padrão novo. As redes não permitem trocar esses itens por integração, então cada rede é atualizada à mão. Marque cada uma depois de aplicar.';
     const feitas=KIT.filter(k=>kitDocs[k.rede]?.aplicado).length;
@@ -254,6 +294,7 @@ function renderPrev(id){const i=itens.find(x=>x.id===id);const box=document.quer
 function renderList(){
   const box=$('list');
   if(dia==='identidade'){renderKit();return}
+  if(dia==='semana'){renderSemana();return}
   const open=new Set([...box.querySelectorAll('details[open]')].map(d=>d.dataset.k));
   const drafts={};box.querySelectorAll('textarea').forEach(t=>drafts[t.id]=t.value);
   const vis=itens.filter(i=>filtro.has(i.status||'pendente')).sort((a,b)=>(b.prioridade||0)-(a.prioridade||0)||String(a.id).localeCompare(b.id));
@@ -266,9 +307,10 @@ function renderList(){
     const antes=(i.roteiro||'').match(/Antes de publicar:([\s\S]*)/);
     const legV=drafts['leg-'+i.id]??i.legenda??'';const xV=drafts['x-'+i.id]??i.textoX;
     const ocup=salvando.has(i.id)?'disabled':'';
-    return `<article class="item ${st}" style="--c:${L.cor}"><div class="stripe"></div><div class="inner">
+    return `<article class="item ${st}" id="item-${id}" style="--c:${L.cor}"><div class="stripe"></div><div class="inner">
       <div class="left">
         <div class="meta"><span class="linha">${esc(L.nome)}</span>${(i.formatos||[]).map(f=>`<span class="tag">${esc(f)}</span>`).join('')}<span class="pill st-${st}">${STATUS[st]}</span><span class="prio">prioridade ${esc(i.prioridade??'–')}/5</span></div>
+        ${i.dataPublicacao?`<div class="agenda">Publicação: ${esc(fmtDia(i.dataPublicacao))} · ${esc(HORARIOS)}</div>`:'<div class="note">Sem dia de publicação. Encaixe na aba Semana.</div>'}
         <h3>${esc(i.titulo)}</h3>
         ${i.gancho?`<p class="gancho">${esc(i.gancho)}</p>`:''}
         ${i.baseLegal?`<div class="note"><b>Base:</b> ${esc(i.baseLegal)}</div>`:''}
@@ -308,6 +350,31 @@ function renderKit(){
       <label class="check"><input type="checkbox" id="kit-${k.rede}" data-act="kit" data-rede="${k.rede}" ${d.aplicado?'checked':''} ${canWrite?'':'disabled'}> Aplicado no ${esc(k.nome)}</label>
       ${d.aplicado&&d.em?`<span class="note">Marcado em ${esc(new Date(d.em).toLocaleString('pt-BR'))}</span>`:''}${erros['kit-'+k.rede]?`<div class="erro" role="alert">${esc(erros['kit-'+k.rede])}</div>`:''}</div>`}).join('')}</div></div>`;
 }
+function renderSemana(){
+  const ds=diasDaSemana(),hoje=iso(new Date());
+  const fim=ds[4].obj.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}),ini=ds[0].obj.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+  const opcoes=linha=>{const ord=[...pool].sort((a,b)=>(b.linha===linha)-(a.linha===linha)||(b.status==='aprovado')-(a.status==='aprovado')||(b.prioridade||0)-(a.prioridade||0));
+    return ord.map(p=>`<option value="${esc(p.id)}">${p.linha===linha?'★ ':''}${p.status==='aprovado'?'[aprovado] ':''}${esc(p.titulo)}</option>`).join('')};
+  $('list').innerHTML=`<div class="semana">
+    <div class="kitcard"><div class="semnav"><button class="btn mini" data-act="sem-nav" data-d="-7">‹ Semana anterior</button><h3>Semana de ${ini} a ${fim}</h3><button class="btn mini" data-act="sem-nav" data-d="7">Próxima semana ›</button></div>
+      <div class="crono">${CRONOGRAMA.map(c=>`<div class="lin"><b style="text-transform:capitalize">${c.nome}</b><span>${esc(c.tema)}</span></div>`).join('')}<div class="lin"><b>Horários</b><span>${esc(HORARIOS)}</span></div></div></div>
+    <div class="dias5">${ds.map(d=>{const L=LINHAS[d.linha]||{cor:'#999'};const its=semanaItens.filter(i=>i.dataPublicacao===d.data);
+      const corpo=its.length?its.map(i=>{const st=i.status||'pendente';const IL=LINHAS[i.linha]||L;return `
+        ${(i.imagens||[]).length?`<img class="thumb" src="${esc(i.imagens[0])}" alt="Capa do post" loading="lazy">`:`<div class="thumbph" style="--c:${IL.cor}">${esc(i.titulo)}</div>`}
+        <h4>${esc(i.titulo)}</h4><div class="row"><span class="pill st-${st}">${STATUS[st]}</span>${i.linha!==d.linha?`<span class="tag">${esc(IL.nome)}</span>`:''}</div>
+        ${erros[i.id]?`<div class="erro">${esc(erros[i.id])}</div>`:''}
+        <div class="actions">${canWrite&&st!=='aprovado'?`<button class="btn aprovar mini" data-act="aprovado" data-id="${esc(i.id)}" ${salvando.has(i.id)?'disabled':''}>Aprovar</button>`:''}<button class="btn mini" data-act="sem-ver" data-id="${esc(i.id)}">Ver prévia</button>${canWrite?`<button class="btn mini" data-act="sem-tirar" data-id="${esc(i.id)}">Tirar do dia</button>`:''}</div>`}).join('<hr style="border:0;border-top:1px solid var(--line);margin:4px 0">')
+        :`<div class="vazio">Nenhum post neste dia.${canWrite&&pool.length?`<label class="lbl" for="enc-${d.data}">Encaixar sugestão</label><select id="enc-${d.data}" data-act="sem-encaixar" data-data="${d.data}"><option value="">Escolha…</option>${opcoes(d.linha)}</select>`:''}</div>`;
+      return `<div class="slot ${d.data===hoje?'hoje':''}" style="--c:${L.cor}"><div class="topo"><b>${d.nome} ${d.obj.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}</b><span>${esc(d.tema)}</span></div><div class="conteudo">${corpo}</div></div>`}).join('')}</div>
+    ${pool.length?`<p class="note">★ marca as sugestões da linha prevista para o dia. Sugestões sem dia: ${pool.length}.</p>`:''}
+  </div>`;
+}
+function assinarSemana(){
+  unsubSemana.forEach(u=>u());unsubSemana=[];if(!db)return;
+  const ds=diasDaSemana();
+  unsubSemana.push(db.collection('itens').where('dataPublicacao','>=',ds[0].data).where('dataPublicacao','<=',ds[4].data).onSnapshot(s=>{semanaItens=s.docs.map(x=>({...x.data(),id:x.id}));if(dia==='semana'){renderSummary();renderList()}},e=>{$('sumText').textContent='Não foi possível carregar a semana ('+(e&&e.code||'erro')+').'}));
+  unsubSemana.push(db.collection('itens').where('status','in',['pendente','aprovado']).limit(400).onSnapshot(s=>{pool=s.docs.map(x=>({...x.data(),id:x.id})).filter(i=>!i.dataPublicacao);if(dia==='semana'){renderSummary();renderList()}},()=>{}));
+}
 function renderAll(){renderDays();renderSummary();renderFilters();renderList()}
 
 /* ---------- gravações ---------- */
@@ -323,6 +390,9 @@ const decisao=(status,extra={})=>({status,decididoEm:new Date().toISOString(),de
 
 document.addEventListener('click',async ev=>{
   const b=ev.target.closest('[data-act]');if(!b||b.tagName==='INPUT')return;const id=b.dataset.id,act=b.dataset.act;
+  if(act==='sem-nav'){semanaIni.setDate(semanaIni.getDate()+ +b.dataset.d);semanaIni=new Date(semanaIni);semanaItens=[];assinarSemana();renderSummary();renderList();return}
+  if(act==='sem-tirar'){await gravar(id,{dataPublicacao:''},'Post retirado do dia');return}
+  if(act==='sem-ver'){const i=[...semanaItens,...pool].find(x=>x.id===id);if(i){irPara=id;selectDia(i.dia)}return}
   if(act==='net'){prevState[id].net=b.dataset.net;prevState[id].slide=0;renderPrev(id);return}
   if(act==='slide'){const i=itens.find(x=>x.id===id);const n=(i.imagens||[]).length;prevState[id].slide=Math.max(0,Math.min(n-1,prevState[id].slide+ +b.dataset.d));renderPrev(id);return}
   if(act==='mais'){prevState[id].aberto=!prevState[id].aberto;renderPrev(id);return}
@@ -334,7 +404,9 @@ document.addEventListener('click',async ev=>{
   if(STATUS[act])await gravar(id,decisao(act,act==='pendente'?{comentario:''}:{}),'Marcado como '+STATUS[act].toLowerCase());
 });
 document.addEventListener('change',async ev=>{
-  const t=ev.target;if(t.dataset.act!=='kit'||!db)return;const rede=t.dataset.rede;delete erros['kit-'+rede];
+  const t=ev.target;
+  if(t.dataset.act==='sem-encaixar'){if(t.value)await gravar(t.value,{dataPublicacao:t.dataset.data},'Post encaixado em '+fmtDia(t.dataset.data));return}
+  if(t.dataset.act!=='kit'||!db)return;const rede=t.dataset.rede;delete erros['kit-'+rede];
   try{await db.collection('kit').doc(rede).set({aplicado:t.checked,em:new Date().toISOString(),por:me||''});toast(t.checked?'Rede marcada como atualizada':'Marcação removida')}
   catch(e){erros['kit-'+rede]=msgErro(e);t.checked=!t.checked;renderList()}
 });
@@ -346,8 +418,9 @@ document.addEventListener('input',ev=>{const t=ev.target;
 function selectDia(d){
   dia=d;try{localStorage.setItem('pauta-dia',d)}catch(e){}
   if(unsubItens){unsubItens();unsubItens=null}itens=[];renderAll();
-  if(d==='identidade'||!db)return;
-  unsubItens=db.collection('itens').where('dia','==',d).onSnapshot(s=>{itens=s.docs.map(x=>({...x.data(),id:x.id}));renderSummary();renderList()},
+  if(d==='identidade'||d==='semana'||!db)return;
+  unsubItens=db.collection('itens').where('dia','==',d).onSnapshot(s=>{itens=s.docs.map(x=>({...x.data(),id:x.id}));renderSummary();renderList();
+    if(irPara){const el=document.getElementById('item-'+irPara);if(el){el.scrollIntoView({behavior:'smooth',block:'start'});irPara=null}}},
     e=>{$('sumText').textContent='A conexão com a pauta caiu ('+(e&&e.code||'erro')+'). Recarregue a página.'});
 }
 renderAll();
@@ -355,12 +428,13 @@ renderAll();
   db=await claude.use('db');const user=await claude.use('user');
   if(!db){$('sumTitle').textContent='Central indisponível';$('sumText').textContent='Entre na sua conta Claude com acesso a esta página para ver e aprovar as publicações.';return}
   try{me=user?await user.id():null;const c=user?await user.can('data.write'):null;if(c===false)canWrite=false}catch(e){}
+  assinarSemana();
   db.collection('kit').onSnapshot(s=>{kitDocs={};s.docs.forEach(x=>kitDocs[x.id]=x.data());if(dia==='identidade'){renderSummary();renderList()}},()=>{});
   db.collection('pautas').orderBy('id','desc').limit(30).onSnapshot(s=>{
     pautas=s.docs.map(x=>({...x.data(),id:x.id}));
     if(!dia){let saved=null;try{saved=localStorage.getItem('pauta-dia')}catch(e){}
       const firstDay=pautas.find(p=>/^\d/.test(p.id));
-      const pick=(saved==='identidade'||pautas.some(p=>p.id===saved))?saved:((firstDay||pautas[0])&&(firstDay||pautas[0]).id);if(pick){selectDia(pick);return}}
+      const pick=(saved==='identidade'||saved==='semana'||pautas.some(p=>p.id===saved))?saved:'semana';if(pick){selectDia(pick);return}}
     renderDays();renderSummary();
   },e=>{$('sumText').textContent='Não foi possível carregar as pautas ('+(e&&e.code||'erro')+'). Recarregue a página.'});
 })();
