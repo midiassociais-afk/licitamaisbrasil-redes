@@ -1,6 +1,6 @@
 // Renderiza carrosséis 1080x1350 a partir de um JSON de peças (ver reedicoes.json).
 // Uso: node render-carrossel.mjs <pecas.json> <pasta-saida> [id-opcional]
-import { chromium } from 'playwright';
+import { abrirNavegador } from './navegador.mjs';
 import { readFileSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -87,7 +87,7 @@ dt{color:#55636E}dd{margin:0;font-weight:600}
 </style></head><body>${peca.slides.map((s, i) => tela(s, i, peca.slides.length, t)).join('')}</body></html>`;
 }
 
-const browser = await chromium.launch();
+const browser = await abrirNavegador();
 const page = await browser.newPage({ viewport: { width: 1080, height: 1350 }, deviceScaleFactor: 1 });
 for (const peca of pecas) {
   const pasta = path.resolve(outDir, peca.arquivo);

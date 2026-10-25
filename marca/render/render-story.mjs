@@ -1,6 +1,6 @@
 // Renderiza o story de oportunidade (1080x1920) a partir de um item da pauta.
 // Uso: node render-story.mjs <item.json> <saida.png>
-import { chromium } from 'playwright';
+import { abrirNavegador } from './navegador.mjs';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -60,7 +60,7 @@ h1{font:800 64px/1.1 Poppins;letter-spacing:-.015em;text-wrap:balance}
   <div class="cta"><b>Participe pela Licita Mais Brasil</b><span>${esc(campos['Acesse'] || 'licitamaisbrasil.com.br')}</span></div>
 </div><div class="bar"></div></body></html>`;
 
-const browser = await chromium.launch();
+const browser = await abrirNavegador();
 const page = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
 await page.setContent(html, { waitUntil: 'load' });
 await page.evaluate(() => document.fonts.ready);

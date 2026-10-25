@@ -1,6 +1,6 @@
 // Gera o kit de perfil das redes: capas, foto de perfil e capas de destaques do Instagram.
 // Uso: node render-kit.mjs [pasta-saida]
-import { chromium } from 'playwright';
+import { abrirNavegador } from './navegador.mjs';
 import { readFileSync, mkdirSync, copyFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -66,7 +66,7 @@ const destaques = [
   </div></body>`
 }));
 
-const browser = await chromium.launch();
+const browser = await abrirNavegador();
 for (const p of [...capas, ...destaques]) {
   const page = await browser.newPage({ viewport: { width: p.w, height: p.h }, deviceScaleFactor: p.scale || 1 });
   await page.setContent(`<!doctype html><html><head><meta charset="utf-8"><style>${BASE}</style></head>${p.html}</html>`, { waitUntil: 'load' });
