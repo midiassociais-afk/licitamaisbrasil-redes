@@ -198,6 +198,9 @@ const MC='Metricool Social Media Management',MC_BLOG='7650942',TZ='America/Sao_P
 const RAW='https://raw.githubusercontent.com/midiassociais-afk/licitamaisbrasil-redes/main/marca/saida/';
 const MC_REDES=[{id:'instagram',nome:'Instagram',hora:'18:30'},{id:'facebook',nome:'Facebook',hora:'18:30'},{id:'linkedin',nome:'LinkedIn',hora:'11:00'},{id:'twitter',nome:'X',hora:'11:00'}];
 let mcp=null;const mcState={};
+// Ajuste imediato: o Claude da conta de quem aprova reescreve o texto; a arte é refeita pela tarefa de ajustes (de hora em hora)
+let sampleFn=null;const ajState={};
+const AJ_HORARIO='em até 1 hora (dias úteis, das 8h às 18h)';
 const AVATAR='logos/simbolo_colorido.png';
 const KIT=[
   {rede:'instagram',nome:'Instagram',arquivos:['Perfil_Todas_as_Redes_1080x1080.png'],destaques:true,passos:['No app, abra o perfil e toque em Editar perfil › Editar foto.','Envie Perfil_Todas_as_Redes_1080x1080.png.','Para cada destaque: toque e segure › Editar destaque › Editar capa › escolha o arquivo Destaque_….png correspondente.','Crie o destaque "Oportunidades" com a capa Destaque_Oportunidades.png.']},
@@ -335,11 +338,16 @@ function renderList(){
           <button class="btn" data-act="descartado" data-id="${id}" ${st==='descartado'||ocup?'disabled':''}>Descartar</button>
           ${st!=='pendente'?`<button class="btn" data-act="pendente" data-id="${id}" ${ocup}>Voltar a pendente</button>`:''}
         </div>`:'<div class="note">Você pode ver a pauta, mas não aprovar.</div>'}
-        ${st==='aprovado'?painelMetricool(i):''}
+        ${i.artePendente?`<div class="alerta">A arte está sendo refeita com o texto ajustado, ${AJ_HORARIO}. Até lá a prévia mostra a arte anterior e o envio ao Metricool fica bloqueado.</div>`:''}
+        ${st==='aprovado'&&!i.artePendente?painelMetricool(i):''}
         ${salvando.has(i.id)?'<div class="note">Gravando…</div>':''}
         ${erros[i.id]?`<div class="erro" role="alert">${esc(erros[i.id])}</div>`:''}
         ${i.decididoEm&&st!=='pendente'?`<div class="note">Decisão gravada em ${esc(new Date(i.decididoEm).toLocaleString('pt-BR'))}</div>`:''}
-        <div class="ajuste" id="aj-${id}" hidden><label class="lbl" for="cm-${id}">O que precisa mudar?</label><textarea id="cm-${id}" style="min-height:70px">${esc(drafts['cm-'+i.id]??'')}</textarea><div class="actions" style="margin-top:6px"><button class="btn ajustar" data-act="enviar-ajuste" data-id="${id}">Enviar pedido</button></div></div>
+        <div class="ajuste" id="aj-${id}" ${ajState[i.id]?.aberto?'':'hidden'}><label class="lbl" for="cm-${id}">O que precisa mudar?</label><textarea id="cm-${id}" style="min-height:70px">${esc(drafts['cm-'+i.id]??ajState[i.id]?.pedido??'')}</textarea>
+          <div class="actions" style="margin-top:6px">${sampleFn?`<button class="btn aprovar" data-act="aj-agora" data-id="${id}" ${ajState[i.id]?.carregando?'disabled':''}>${ajState[i.id]?.carregando?'Reescrevendo…':'Ajustar agora'}</button>`:''}<button class="btn ajustar" data-act="enviar-ajuste" data-id="${id}">Deixar para a tarefa</button></div>
+          <p class="note">${sampleFn?`<b>Ajustar agora</b>: o texto é reescrito na hora e você confere antes de aplicar; a arte é refeita ${AJ_HORARIO}. `:''}<b>Deixar para a tarefa</b>: o ajuste completo é feito ${AJ_HORARIO}.</p>
+          ${ajState[i.id]?.erro?`<div class="erro" role="alert">${esc(ajState[i.id].erro)}</div>`:''}</div>
+        ${ajState[i.id]?.proposta?propostaAjuste(i):''}
       </div>
       <div data-prev="${id}">${previa(i)}</div>
     </div></article>`}).join('');
@@ -356,6 +364,73 @@ function renderKit(){
       <label class="check"><input type="checkbox" id="kit-${k.rede}" data-act="kit" data-rede="${k.rede}" ${d.aplicado?'checked':''} ${canWrite?'':'disabled'}> Aplicado no ${esc(k.nome)}</label>
       ${d.aplicado&&d.em?`<span class="note">Marcado em ${esc(new Date(d.em).toLocaleString('pt-BR'))}</span>`:''}${erros['kit-'+k.rede]?`<div class="erro" role="alert">${esc(erros['kit-'+k.rede])}</div>`:''}</div>`}).join('')}</div></div>`;
 }
+/* ---------- ajuste imediato ---------- */
+function promptAjuste(i,pedido){
+  const atual={titulo:i.titulo,gancho:i.gancho||'',baseLegal:i.baseLegal||'',linha:i.linha,slides:i.slides||[],telas:i.telas||null,legenda:i.legenda||'',textoX:i.textoX??null};
+  return `Você edita posts das redes sociais da Licita Mais Brasil (plataforma de licitações eletrônicas). Aplique SOMENTE o pedido de ajuste abaixo ao post atual. Não mude o que o pedido não pede. Não invente fatos, números, datas nem artigos de lei; mantenha as citações legais que já existem. Português do Brasil, frases curtas, voz ativa, "Licita Mais Brasil" por extenso.
+
+PEDIDO DE AJUSTE:
+${pedido}
+
+POST ATUAL (JSON):
+${JSON.stringify(atual)}
+
+Regras do campo "telas" (uma tela por imagem):
+- {"tipo":"capa","kicker":"…","titulo":"até 70 caracteres","sub":"até 90"}: sempre a primeira
+- {"tipo":"texto","kicker":"…","titulo":"até 50","texto":"até 220","destaque":"opcional"}
+- {"tipo":"lista","kicker":"…","titulo":"até 50","itens":["2 a 4 itens de até 70"],"destaque":"opcional"}
+- {"tipo":"oport","modalidade":"…","objeto":"até 60","orgao":"…","abertura":"…","processo":"…","link":"…"}
+- {"tipo":"cta","titulo":"…","texto":"…","url":"licitamaisbrasil.com.br"}: sempre a última de um carrossel
+Se "telas" vier null, monte as telas a partir de "slides" (uma tela por slide, mesmo texto). "slides" é o texto corrido das telas, um por tela, com o título na primeira linha; mantenha "slides" e "telas" coerentes.
+"textoX": até 270 caracteres, sem emojis; se vier null, devolva null.
+
+Responda só com um objeto JSON:
+{"titulo":"…","slides":["…"],"telas":[…],"legenda":"…","textoX":"…","mudouArte":true,"resumo":"uma frase dizendo o que mudou"}
+"mudouArte" é true quando algum texto que aparece nas imagens (telas) mudou.`;
+}
+function propostaAjuste(i){
+  const p=ajState[i.id].proposta,id=esc(i.id);
+  const mud=(a,b)=>JSON.stringify(a??null)!==JSON.stringify(b??null);
+  return `<div class="kitcard" style="padding:14px;gap:10px;border-color:var(--accent)">
+    <b style="font-family:var(--f-tit)">Proposta de ajuste</b>
+    <p class="note" style="margin:0">${esc(p.resumo||'')}</p>
+    ${mud(p.titulo,i.titulo)?`<div><span class="lbl">Título</span><div>${esc(p.titulo)}</div></div>`:''}
+    ${mud(p.slides,i.slides)?`<div><span class="lbl">Telas</span><ol class="slides">${(p.slides||[]).map((s,k)=>`<li${(i.slides||[])[k]!==s?' style="background:var(--warn-bg);border-radius:6px;padding:2px 6px"':''}>${esc(s)}</li>`).join('')}</ol></div>`:''}
+    ${mud(p.legenda,i.legenda)?`<div><span class="lbl">Legenda</span><p class="note" style="white-space:pre-wrap;margin:0">${esc(p.legenda)}</p></div>`:''}
+    ${p.textoX!=null&&mud(p.textoX,i.textoX)?`<div><span class="lbl">Texto do X · ${[...p.textoX].length}/280</span><p class="note" style="margin:0">${esc(p.textoX)}</p></div>`:''}
+    ${p.mudouArte&&(i.imagens||[]).length?`<div class="note">A arte será refeita ${AJ_HORARIO} depois de aplicar.</div>`:''}
+    ${i.metricool?'<div class="alerta">Este post já foi enviado ao Metricool. Depois do ajuste, apague o post antigo lá e envie de novo.</div>':''}
+    <div class="actions"><button class="btn aprovar" data-act="aj-aplicar" data-id="${id}">Aplicar ajuste</button><button class="btn" data-act="aj-descartar" data-id="${id}">Descartar proposta</button></div>
+  </div>`;
+}
+const msgSample=e=>{const c=e&&e.code;
+  if(c==='not_granted'||c==='sampling_disabled'||c==='not_declared')return 'O Claude não está liberado para esta página. Use "Deixar para a tarefa".';
+  if(c==='rate_limited')return 'Limite de uso do Claude atingido agora. Tente mais tarde ou use "Deixar para a tarefa".';
+  if(c==='invalid_json'||c==='empty_completion')return 'A resposta veio incompleta. Tente de novo, talvez com um pedido mais curto.';
+  if(c==='refused')return 'O Claude não aceitou esse pedido. Reformule o pedido.';
+  if(c==='session_expired')return 'Sua sessão expirou. Entre de novo no claude.ai.';
+  return 'Não foi possível reescrever agora ('+(c||'erro')+'). Tente de novo ou use "Deixar para a tarefa".'};
+async function ajustarAgora(i){
+  const s=ajState[i.id]||(ajState[i.id]={});s.aberto=true;
+  const pedido=($('cm-'+i.id)?.value||'').trim();s.pedido=pedido;
+  if(!pedido){s.erro='Escreva o que precisa mudar.';renderList();return}
+  s.carregando=true;s.erro='';s.proposta=null;renderList();
+  try{
+    const r=await sampleFn.json(promptAjuste(i,pedido),{modelTier:'default',cache:false});
+    if(!r||typeof r!=='object'||!Array.isArray(r.slides)||!Array.isArray(r.telas)||!r.telas.length||!r.telas.every(t=>t&&t.tipo))throw{code:'invalid_json'};
+    s.proposta=r;
+  }catch(e){s.erro=msgSample(e)}
+  s.carregando=false;renderList();
+}
+async function aplicarAjuste(i){
+  const s=ajState[i.id],p=s.proposta;
+  const dados={titulo:String(p.titulo||i.titulo),slides:p.slides.map(String),telas:p.telas,legenda:String(p.legenda||''),
+    status:'pendente',comentario:'',comentarioAtendido:s.pedido,ajustadoEm:new Date().toISOString(),decididoEm:new Date().toISOString(),decididoPor:me||''};
+  if(p.textoX!=null)dados.textoX=String(p.textoX);
+  if(p.mudouArte&&(i.imagens||[]).length)dados.artePendente=true;
+  if(await gravar(i.id,dados,'Ajuste aplicado. Confira e aprove de novo.')){delete ajState[i.id];if(mcState[i.id])delete mcState[i.id];renderList()}
+}
+
 /* ---------- envio ao Metricool ---------- */
 const publicas=i=>(i.imagensPublicas&&i.imagensPublicas.length)?i.imagensPublicas:(i.imagens||[]).map(p=>RAW+p);
 function proximoDiaUtil(){const d=new Date();d.setDate(d.getDate()+1);while([0,6].includes(d.getDay()))d.setDate(d.getDate()+1);return iso(d)}
@@ -478,6 +553,9 @@ const decisao=(status,extra={})=>({status,decididoEm:new Date().toISOString(),de
 document.addEventListener('click',async ev=>{
   const b=ev.target.closest('[data-act]');if(!b||b.tagName==='INPUT')return;const id=b.dataset.id,act=b.dataset.act;
   if(act==='sem-nav'){semanaIni.setDate(semanaIni.getDate()+ +b.dataset.d);semanaIni=new Date(semanaIni);semanaItens=[];assinarSemana();renderSummary();renderList();return}
+  if(act==='aj-agora'){const i=itens.find(x=>x.id===id);if(i&&sampleFn)await ajustarAgora(i);return}
+  if(act==='aj-aplicar'){const i=itens.find(x=>x.id===id);if(i&&ajState[id]?.proposta)await aplicarAjuste(i);return}
+  if(act==='aj-descartar'){if(ajState[id]){ajState[id].proposta=null}renderList();return}
   if(act==='mc-abrir'||act==='mc-fechar'){const i=itens.find(x=>x.id===id);if(i){const s=estadoMc(i);s.aberto=act==='mc-abrir';s.erro='';s.msg=''}renderList();return}
   if(act==='mc-enviar'){const i=itens.find(x=>x.id===id);if(i)await enviarMetricool(i);renderList();return}
   if(act==='sem-tirar'){await gravar(id,{dataPublicacao:''},'Post retirado do dia');return}
@@ -488,7 +566,7 @@ document.addEventListener('click',async ev=>{
   if(act==='copiar'){const t=$('leg-'+id);try{await navigator.clipboard.writeText(t.value);toast('Legenda copiada')}catch(e){t.focus();t.select();toast('Texto selecionado: use Ctrl+C')}return}
   if(act==='salvar'){const d={legenda:$('leg-'+id).value,editadoEm:new Date().toISOString()};const x=$('x-'+id);if(x){if([...x.value].length>280){toast('O X aceita até 280 caracteres');return}d.textoX=x.value}
     await gravar(id,d,'Textos salvos');return}
-  if(act==='ajustar'){const box=$('aj-'+id);box.hidden=!box.hidden;if(!box.hidden)$('cm-'+id).focus();return}
+  if(act==='ajustar'){const s=ajState[id]||(ajState[id]={});s.aberto=!s.aberto;const box=$('aj-'+id);box.hidden=!s.aberto;if(s.aberto)$('cm-'+id).focus();return}
   if(act==='enviar-ajuste'){const c=$('cm-'+id).value.trim();if(!c){toast('Escreva o que precisa mudar');return}await gravar(id,decisao('ajustar',{comentario:c}),'Pedido de ajuste enviado');return}
   if(STATUS[act])await gravar(id,decisao(act,act==='pendente'?{comentario:''}:{}),'Marcado como '+STATUS[act].toLowerCase());
 });
@@ -521,6 +599,7 @@ renderAll();
 (async()=>{
   db=await claude.use('db');const user=await claude.use('user');
   claude.use('mcp').then(m=>{mcp=m;if(dia&&dia!=='semana'&&dia!=='identidade')renderList()}).catch(()=>{});
+  claude.use('sample').then(s=>{sampleFn=s;if(dia&&dia!=='semana'&&dia!=='identidade')renderList()}).catch(()=>{});
   if(!db){$('sumTitle').textContent='Central indisponível';$('sumText').textContent='Entre na sua conta Claude com acesso a esta página para ver e aprovar as publicações.';return}
   try{me=user?await user.id():null;const c=user?await user.can('data.write'):null;if(c===false)canWrite=false}catch(e){}
   assinarSemana();

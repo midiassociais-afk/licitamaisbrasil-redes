@@ -102,7 +102,7 @@ Query em `itens` com where status == "ajustar". Para cada item com `comentario` 
 2. Renderize: `cd marca/render && npm ci --no-audit --no-fund && node render-carrossel.mjs /tmp/lmb/pecas.json ../saida/pautas/<dia> && cd ../..`. Se a saída disser "ATENÇÃO, ainda não cabe", encurte aquela tela e renderize de novo.
 3. Envie as artes ao GitHub (elas ganham link público para o agendamento futuro): `git add marca/saida/pautas/<dia> && git commit -m "Artes da pauta de <dia>" && (git push origin HEAD:main || (git pull --rebase origin main && git push origin HEAD:main))`.
 4. Publique as imagens na Central: Artifact `action:"read"` com a url da Central (obrigatório antes de publicar) e depois `action:"publish"` com a mesma `url`, `file_path` = `marca/pauta-diaria.html` (sem alterar o arquivo), `root` = `marca/saida` e `files` = `[{"path":"pautas/<dia>/<doc_id>/01.png"}, …]` com todas as telas geradas. Não passe `capabilities` nem `icon`.
-5. ArtifactData batch `update` em cada item (if_version da gravação) com `imagens: ["pautas/<dia>/<doc_id>/01.png", …]` e `imagensPublicas: ["https://raw.githubusercontent.com/midiassociais-afk/licitamaisbrasil-redes/main/marca/saida/pautas/<dia>/<doc_id>/01.png", …]`.
+5. ArtifactData batch `update` em cada item (if_version da gravação) com `telas` (a mesma lista de telas usada no pecas.json, para permitir ajustes rápidos depois), `imagens: ["pautas/<dia>/<doc_id>/01.png", …]` e `imagensPublicas: ["https://raw.githubusercontent.com/midiassociais-afk/licitamaisbrasil-redes/main/marca/saida/pautas/<dia>/<doc_id>/01.png", …]`.
 Se algo falhar, siga sem imagens e registre {nome:"Artes", ok:false, nota:"<erro>"} nas fontes da pauta.
 
 ## Passo 8 — Encaixe no cronograma
