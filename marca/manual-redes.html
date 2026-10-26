@@ -116,6 +116,11 @@ td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
 .note{border-left:4px solid var(--amarelo);background:var(--chip);padding:14px 18px;border-radius:0 12px 12px 0}
 .cal td:first-child{font-family:var(--f-tit);font-weight:600;white-space:nowrap}
 footer{margin-top:80px}
+.txtp{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.5 var(--f-txt);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--fg)}
+.txtp.longo{max-height:220px;overflow:auto}
+.cnt{font-size:12.5px}
+.copiar{justify-self:start;font:600 13px var(--f-tit);border-radius:10px;padding:7px 14px;cursor:pointer;border:1px solid var(--line);background:var(--bg);color:var(--fg)}
+.copiar:hover,.copiar:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
 @media (prefers-reduced-motion:no-preference){nav.toc a{transition:border-color .15s,color .15s}}
 </style>
 
@@ -128,7 +133,7 @@ footer{margin-top:80px}
     <h1 class="hero-t">Uma só cara em <em>Instagram, Facebook, YouTube, LinkedIn e X</em>.</h1>
     <p class="lead">Diagnóstico das redes, regras de marca, templates por linha editorial e o plano para gerar conteúdo todos os dias com aprovação humana.</p>
     <nav class="toc" aria-label="Seções">
-      <a href="#diagnostico">Diagnóstico</a><a href="#cores">Cores</a><a href="#tipografia">Tipografia</a><a href="#logo">Logo e perfis</a><a href="#pilares">Linhas editoriais</a><a href="#templates">Templates</a><a href="#capas">Capas</a><a href="#voz">Voz</a><a href="#automacao">Automação</a><a href="#limites">Limitações</a><a href="#precisamos">O que precisamos</a>
+      <a href="#diagnostico">Diagnóstico</a><a href="#cores">Cores</a><a href="#tipografia">Tipografia</a><a href="#logo">Logo e perfis</a><a href="#pilares">Linhas editoriais</a><a href="#templates">Templates</a><a href="#capas">Capas</a><a href="#voz">Voz</a><a href="#textos">Textos padrão</a><a href="#automacao">Automação</a><a href="#limites">Limitações</a><a href="#precisamos">O que precisamos</a>
     </nav>
   </div>
 </header>
@@ -434,6 +439,42 @@ footer{margin-top:80px}
   </div>
 </section>
 
+<section id="textos">
+  <div class="sec-head"><span class="kick plus">08b · Textos padrão</span><h2>A mesma apresentação em todas as redes</h2>
+  <p class="muted">Textos conferidos contra o limite de caracteres de cada rede em 26/10/2026. Antes de aplicar, confirme o horário de atendimento e a lista de recursos.</p></div>
+  <div class="grid g2">
+    <div class="box"><h4>Slogan · todas as redes</h4><pre class="txtp" id="t-slogan">Licitações eletrônicas simples, seguras e transparentes.</pre><span class="muted cnt">56 caracteres</span><button class="copiar" data-alvo="t-slogan">Copiar</button></div>
+    <div class="box"><h4>Instagram · bio</h4><pre class="txtp" id="t-ig">Licitações eletrônicas integradas ao PNCP.
+Simples para o fornecedor, segura para o órgão, transparente para o cidadão.
+Cadastre-se grátis 👇</pre><span class="muted cnt">141 de 150 caracteres · link: licitamaisbrasil.com.br</span><button class="copiar" data-alvo="t-ig">Copiar</button></div>
+    <div class="box"><h4>X · bio</h4><pre class="txtp" id="t-x">Plataforma de licitações eletrônicas integrada ao PNCP. Jurisprudência do TCU, legislação e oportunidades para órgãos públicos e fornecedores.</pre><span class="muted cnt">142 de 160 caracteres · site: licitamaisbrasil.com.br</span><button class="copiar" data-alvo="t-x">Copiar</button></div>
+    <div class="box"><h4>Facebook · apresentação</h4><pre class="txtp" id="t-fb">Licitações eletrônicas simples, seguras e transparentes. Integrada ao PNCP.</pre><span class="muted cnt">75 de 101 caracteres · em "Sobre", use a descrição longa</span><button class="copiar" data-alvo="t-fb">Copiar</button></div>
+    <div class="box"><h4>LinkedIn · slogan</h4><pre class="txtp" id="t-li">Licitações eletrônicas simples, seguras e transparentes, integradas ao PNCP.</pre><span class="muted cnt">76 de 120 caracteres · em "Visão geral", use a descrição longa</span><button class="copiar" data-alvo="t-li">Copiar</button></div>
+    <div class="box"><h4>Descrição longa · LinkedIn, Facebook e site</h4><pre class="txtp longo" id="t-longa">A Licita Mais Brasil é uma plataforma de licitações eletrônicas, no ar desde 2021 e integrada ao Portal Nacional de Contratações Públicas (PNCP).
+
+Para órgãos públicos: pregão, concorrência, dispensa, credenciamento e pré-qualificação conforme a Lei 14.133/2021, com fase interna, pesquisa de preços, publicação de PCA, atas e contratos no PNCP e assinatura digital, tudo no mesmo sistema.
+
+Para fornecedores: cadastro simples e diversas modalidades gratuitas para participar.
+
+Para o cidadão: editais e sessões abertos para consulta, sem precisar de login.
+
+Atendimento de segunda a sexta, das 8h às 17h: 0800 591 6173 · contato@licitamaisbrasil.com.br
+licitamaisbrasil.com.br</pre><span class="muted cnt">677 caracteres (LinkedIn aceita até 2.000)</span><button class="copiar" data-alvo="t-longa">Copiar</button></div>
+    <div class="box"><h4>YouTube · descrição do canal</h4><pre class="txtp longo" id="t-yt">A Licita Mais Brasil é uma plataforma de licitações eletrônicas, no ar desde 2021 e integrada ao Portal Nacional de Contratações Públicas (PNCP).
+
+Para órgãos públicos: pregão, concorrência, dispensa, credenciamento e pré-qualificação conforme a Lei 14.133/2021, com fase interna, pesquisa de preços, publicação de PCA, atas e contratos no PNCP e assinatura digital, tudo no mesmo sistema.
+
+Para fornecedores: cadastro simples e diversas modalidades gratuitas para participar.
+
+Para o cidadão: editais e sessões abertos para consulta, sem precisar de login.
+
+Atendimento de segunda a sexta, das 8h às 17h: 0800 591 6173 · contato@licitamaisbrasil.com.br
+licitamaisbrasil.com.br
+
+No canal: tutoriais passo a passo da plataforma, o resumo semanal da jurisprudência do TCU e dicas sobre a Lei 14.133/2021. Inscreva-se e ative as notificações.</pre><span class="muted cnt">839 de 1.000 caracteres</span><button class="copiar" data-alvo="t-yt">Copiar</button></div>
+  </div>
+</section>
+
 <section id="automacao">
   <div class="sec-head"><span class="kick plus">09 · Automação diária</span><h2>Do levantamento de temas à publicação</h2>
   <p class="muted">Um robô pesquisa, escreve e monta as peças todo dia de manhã. Uma pessoa da equipe aprova antes de qualquer publicação.</p></div>
@@ -528,4 +569,10 @@ footer{margin-top:80px}
   if('ResizeObserver' in window){const ro=new ResizeObserver(fit);document.querySelectorAll('.stage').forEach(s=>ro.observe(s));}
   else addEventListener('resize',fit);
 })();
+document.addEventListener('click',async e=>{
+  const b=e.target.closest('.copiar');if(!b)return;const el=document.getElementById(b.dataset.alvo);
+  try{await navigator.clipboard.writeText(el.textContent);b.textContent='Copiado'}
+  catch(err){const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Selecionado: use Ctrl+C'}
+  setTimeout(()=>b.textContent='Copiar',2200);
+});
 </script>

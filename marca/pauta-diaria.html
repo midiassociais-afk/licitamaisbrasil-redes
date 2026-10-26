@@ -209,6 +209,17 @@ const KIT=[
   {rede:'youtube',nome:'YouTube',arquivos:['Perfil_Todas_as_Redes_1080x1080.png','YouTube_Banner_2560x1440.png'],passos:['Abra o YouTube Studio › Personalização › Branding.','Imagem do perfil: Perfil_…; Imagem do banner: YouTube_Banner_2560x1440.png.','Publicar.']},
   {rede:'x',nome:'X',arquivos:['Perfil_Todas_as_Redes_1080x1080.png','X_Capa_1500x500.png'],passos:['No perfil @licitamaisbr, clique em Editar perfil.','Troque a foto (Perfil_…) e o cabeçalho (X_Capa_1500x500.png).','Salvar.']}
 ];
+// Textos padrão de perfil (conferidos contra o limite de cada rede em 26/10/2026)
+const DESC_LONGA='A Licita Mais Brasil é uma plataforma de licitações eletrônicas, no ar desde 2021 e integrada ao Portal Nacional de Contratações Públicas (PNCP).\n\nPara órgãos públicos: pregão, concorrência, dispensa, credenciamento e pré-qualificação conforme a Lei 14.133/2021, com fase interna, pesquisa de preços, publicação de PCA, atas e contratos no PNCP e assinatura digital, tudo no mesmo sistema.\n\nPara fornecedores: cadastro simples e diversas modalidades gratuitas para participar.\n\nPara o cidadão: editais e sessões abertos para consulta, sem precisar de login.\n\nAtendimento de segunda a sexta, das 8h às 17h: 0800 591 6173 · contato@licitamaisbrasil.com.br\nlicitamaisbrasil.com.br';
+const TEXTOS=[
+  {k:'slogan',titulo:'Slogan (todas as redes)',limite:null,texto:'Licitações eletrônicas simples, seguras e transparentes.'},
+  {k:'instagram',titulo:'Instagram · bio',limite:150,obs:'Link: licitamaisbrasil.com.br',texto:'Licitações eletrônicas integradas ao PNCP.\nSimples para o fornecedor, segura para o órgão, transparente para o cidadão.\nCadastre-se grátis 👇'},
+  {k:'x',titulo:'X · bio',limite:160,obs:'Site: licitamaisbrasil.com.br',texto:'Plataforma de licitações eletrônicas integrada ao PNCP. Jurisprudência do TCU, legislação e oportunidades para órgãos públicos e fornecedores.'},
+  {k:'facebook',titulo:'Facebook · apresentação',limite:101,obs:'No campo "Sobre", use a descrição longa.',texto:'Licitações eletrônicas simples, seguras e transparentes. Integrada ao PNCP.'},
+  {k:'linkedin',titulo:'LinkedIn · slogan',limite:120,obs:'Em "Visão geral", use a descrição longa.',texto:'Licitações eletrônicas simples, seguras e transparentes, integradas ao PNCP.'},
+  {k:'longa',titulo:'Descrição longa · LinkedIn, Facebook e site',limite:2000,texto:DESC_LONGA},
+  {k:'youtube',titulo:'YouTube · descrição do canal',limite:1000,texto:DESC_LONGA+'\n\nNo canal: tutoriais passo a passo da plataforma, o resumo semanal da jurisprudência do TCU e dicas sobre a Lei 14.133/2021. Inscreva-se e ative as notificações.'}
+];
 const DESTAQUES=[['Jurisprudência','Destaque_Jurisprudencia.png'],['Legislação','Destaque_Legislacao.png'],['Ferramentas','Destaque_Ferramentas.png'],['A Plataforma','Destaque_Plataforma.png'],['Perguntas','Destaque_Perguntas.png'],['Oportunidades','Destaque_Oportunidades.png']];
 
 const $=id=>document.getElementById(id);
@@ -356,6 +367,10 @@ function renderKit(){
   const base='kit-redes/';
   $('list').innerHTML=`<div class="kit">
     <div class="kitcard"><h3>Foto de perfil, igual nas cinco redes</h3><div class="row"><img src="${base}Perfil_Todas_as_Redes_1080x1080.png" alt="Foto de perfil" style="width:110px;height:110px;border-radius:50%;border:1px solid var(--line);background:#fff"><p class="note" style="max-width:60ch">O símbolo colorido sobre branco, arquivo oficial. Nome de exibição "Licita Mais Brasil" em todas as redes.</p></div></div>
+    <div class="kitcard"><h3>Textos padrão dos perfis</h3><p class="note" style="margin:0">Use os mesmos textos em todas as redes. O número mostra quantos caracteres o texto tem e o limite da rede.</p>
+      <div class="kitgrid">${TEXTOS.map(t=>`<div style="display:grid;gap:6px;align-content:start;min-width:0"><span class="lbl" style="margin:0">${esc(t.titulo)} · ${[...t.texto].length}${t.limite?'/'+t.limite:''} caracteres</span>
+        <div id="txt-${t.k}" style="white-space:pre-wrap;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:13.5px;overflow-wrap:anywhere;${t.texto.length>300?'max-height:180px;overflow:auto':''}">${esc(t.texto)}</div>
+        ${t.obs?`<span class="note">${esc(t.obs)}</span>`:''}<div class="actions"><button class="btn mini" data-act="copiar-texto" data-k="${t.k}">Copiar</button></div></div>`).join('')}</div></div>
     <div class="kitcard"><h3>Capas dos destaques do Instagram</h3><div class="hl">${DESTAQUES.map(([n,a])=>`<figure><div class="circ"><img src="${base}${a}" alt=""></div><figcaption>${esc(n)}</figcaption></figure>`).join('')}</div></div>
     <div class="kitgrid">${KIT.map(k=>{const d=kitDocs[k.rede]||{};const capa=k.arquivos.find(a=>!a.startsWith('Perfil'));
       return `<div class="kitcard"><h3>${esc(k.nome)}</h3>${capa?`<img class="kitimg" src="${base}${capa}" alt="Capa ${esc(k.nome)}">`:''}
@@ -553,6 +568,9 @@ const decisao=(status,extra={})=>({status,decididoEm:new Date().toISOString(),de
 document.addEventListener('click',async ev=>{
   const b=ev.target.closest('[data-act]');if(!b||b.tagName==='INPUT')return;const id=b.dataset.id,act=b.dataset.act;
   if(act==='sem-nav'){semanaIni.setDate(semanaIni.getDate()+ +b.dataset.d);semanaIni=new Date(semanaIni);semanaItens=[];assinarSemana();renderSummary();renderList();return}
+  if(act==='copiar-texto'){const t=TEXTOS.find(x=>x.k===b.dataset.k);if(!t)return;
+    try{await navigator.clipboard.writeText(t.texto);toast('Texto copiado: '+t.titulo)}
+    catch(e){const el=$('txt-'+t.k);const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);toast('Texto selecionado: use Ctrl+C')}return}
   if(act==='aj-agora'){const i=itens.find(x=>x.id===id);if(i&&sampleFn)await ajustarAgora(i);return}
   if(act==='aj-aplicar'){const i=itens.find(x=>x.id===id);if(i&&ajState[id]?.proposta)await aplicarAjuste(i);return}
   if(act==='aj-descartar'){if(ajState[id]){ajState[id].proposta=null}renderList();return}
