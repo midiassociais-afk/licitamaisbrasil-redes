@@ -379,7 +379,7 @@ function painelMetricool(i){
     <span class="lbl">Modo</span>
     <label class="check" style="font-weight:500"><input type="radio" name="mc-modo-${id}" id="mc-r-${id}" data-mc="modo" data-modo="rascunho" data-id="${id}" ${s.modo==='rascunho'?'checked':''}> Rascunho: fica no Metricool, nada é publicado (bom para testar)</label>
     <label class="check" style="font-weight:500"><input type="radio" name="mc-modo-${id}" id="mc-a-${id}" data-mc="modo" data-modo="agendar" data-id="${id}" ${s.modo==='agendar'?'checked':''}> Agendar: o Metricool publica sozinho no dia e hora acima</label>
-    ${s.modo==='agendar'?'<div class="alerta">Atenção: no modo Agendar o post vai ao ar nas redes marcadas, sem nova confirmação.</div>':''}
+    <div class="${s.modo==='agendar'?'alerta':'note'}" id="mc-resumo-${id}" style="font-size:14px">${resumoMc(s)}${s.modo==='agendar'?' O Metricool publica sozinho, sem nova confirmação.':''}</div>
     ${s.erro?`<div class="erro" role="alert">${esc(s.erro)}</div>`:''}${s.msg?`<div class="note">${s.msg}</div>`:''}
     <div class="actions"><button class="btn aprovar" data-act="mc-enviar" data-id="${id}" ${s.enviando||!mcp?'disabled':''}>${s.enviando?'Enviando…':(s.modo==='agendar'?'Agendar no Metricool':'Criar rascunho no Metricool')}</button><button class="btn" data-act="mc-fechar" data-id="${id}">Cancelar</button></div>
     ${!mcp?'<div class="note">O envio ao Metricool funciona com a página aberta no claude.ai, com o conector do Metricool ligado na sua conta.</div>':''}
@@ -392,8 +392,22 @@ const msgMc=e=>{const c=e&&e.code;
   if(c==='tool_error'){const t=(e.result&&e.result.content||[]).map(b=>b.text).filter(Boolean).join(' ')||e.message;return 'O Metricool recusou o post: '+t}
   if(c==='server_unavailable'||c==='upstream_error'||c==='cancelled')return 'O Metricool não respondeu a tempo. O post pode ter sido criado: confira no planejador do Metricool antes de enviar de novo.';
   return 'Não foi possível enviar ('+(c||'erro')+').'};
+// Lê o que está na tela neste momento (data, redes e modo), para o envio nunca usar um valor antigo
+function lerCamposMc(i){
+  const s=estadoMc(i),dt=$('mc-data-'+i.id);
+  if(dt&&dt.value)s.data=dt.value;
+  const marcadas=MC_REDES.filter(r=>{const c=$(`mc-${r.id}-${i.id}`);return c&&c.checked&&!c.disabled}).map(r=>r.id);
+  if(document.getElementById(`mc-${MC_REDES[0].id}-${i.id}`))s.redes=new Set(marcadas);
+  const ag=$('mc-a-'+i.id);if(ag)s.modo=ag.checked?'agendar':'rascunho';
+  return s;
+}
+function resumoMc(s){
+  const nomes=id=>MC_REDES.find(r=>r.id===id).nome,g11=[...s.redes].filter(r=>['linkedin','twitter'].includes(r)).map(nomes),g18=[...s.redes].filter(r=>['instagram','facebook'].includes(r)).map(nomes);
+  if(!g11.length&&!g18.length)return 'Nenhuma rede marcada.';
+  return `${s.modo==='agendar'?'Vai ao ar':'Rascunho para'} <b>${esc(fmtDia(s.data))}</b>: ${[g11.length?`${g11.join(' e ')} às 11h`:'',g18.length?`${g18.join(' e ')} às 18h30`:''].filter(Boolean).join('; ')}.`;
+}
 async function enviarMetricool(i){
-  const s=estadoMc(i),imgs=publicas(i),texto=i.legenda||i.titulo,grupos={};
+  const s=lerCamposMc(i),imgs=publicas(i),texto=i.legenda||i.titulo,grupos={};
   if(!mcp){s.erro='Esta visualização não tem acesso ao Metricool.';return}
   if(!s.redes.size){s.erro='Marque ao menos uma rede.';return}
   MC_REDES.filter(r=>s.redes.has(r.id)).forEach(r=>{const k=r.id==='twitter'?'x':r.hora;(grupos[k]=grupos[k]||{hora:r.hora,redes:[]}).redes.push(r.id)});
@@ -417,7 +431,7 @@ async function enviarMetricool(i){
   s.enviando=false;
   if(feitos.length){
     s.msg=feitos.map(f=>`${f.redes.map(n=>MC_REDES.find(r=>r.id===n).nome).join(' e ')} às ${f.hora}: ${s.modo==='agendar'?'agendado':'rascunho criado'}${f.url?` (<a href="${esc(f.url)}" target="_blank" rel="noopener">abrir no Metricool</a>)`:''}`).join('<br>');
-    try{await db.collection('itens').doc(i.id).update({metricool:{enviadoEm:new Date().toISOString(),modo:s.modo,data:s.data,redes:feitos.flatMap(f=>f.redes.map(n=>MC_REDES.find(r=>r.id===n).nome)),links:feitos.map(f=>f.url).filter(Boolean),por:me||''}})}catch(e){}
+    try{await db.collection('itens').doc(i.id).update({dataPublicacao:s.data,metricool:{enviadoEm:new Date().toISOString(),modo:s.modo,data:s.data,redes:feitos.flatMap(f=>f.redes.map(n=>MC_REDES.find(r=>r.id===n).nome)),links:feitos.map(f=>f.url).filter(Boolean),por:me||''}})}catch(e){}
     if(!s.erro)s.aberto=false;
   }
   renderList();
@@ -480,10 +494,9 @@ document.addEventListener('click',async ev=>{
 });
 document.addEventListener('change',async ev=>{
   const t=ev.target;
-  if(t.dataset.mc){const s=mcState[t.dataset.id];if(!s)return;
-    if(t.dataset.mc==='data')s.data=t.value;
-    if(t.dataset.mc==='rede'){t.checked?s.redes.add(t.dataset.rede):s.redes.delete(t.dataset.rede)}
-    if(t.dataset.mc==='modo'){s.modo=t.dataset.modo;renderList()}
+  if(t.dataset.mc){const i=itens.find(x=>x.id===t.dataset.id);if(!i)return;const s=lerCamposMc(i);
+    if(t.dataset.mc==='modo'){renderList();return}
+    const r=$('mc-resumo-'+t.dataset.id);if(r)r.innerHTML=resumoMc(s)+(s.modo==='agendar'?' O Metricool publica sozinho, sem nova confirmação.':'');
     return}
   if(t.dataset.act==='sem-encaixar'){if(t.value)await gravar(t.value,{dataPublicacao:t.dataset.data},'Post encaixado em '+fmtDia(t.dataset.data));return}
   if(t.dataset.act!=='kit'||!db)return;const rede=t.dataset.rede;delete erros['kit-'+rede];
@@ -491,6 +504,7 @@ document.addEventListener('change',async ev=>{
   catch(e){erros['kit-'+rede]=msgErro(e);t.checked=!t.checked;renderList()}
 });
 document.addEventListener('input',ev=>{const t=ev.target;
+  if(t.dataset.mc==='data'){const i=itens.find(x=>x.id===t.dataset.id);if(i){const s=lerCamposMc(i);const r=$('mc-resumo-'+t.dataset.id);if(r)r.innerHTML=resumoMc(s)+(s.modo==='agendar'?' O Metricool publica sozinho, sem nova confirmação.':'')}}
   if(t.id&&t.id.startsWith('x-')){const c=document.querySelector(`.xc[data-for="${t.id}"]`);if(c){const n=[...t.value].length;c.textContent=n;c.style.color=n>280?'var(--bad-fg)':''}}
   if(t.dataset.prevFor){clearTimeout(t._p);t._p=setTimeout(()=>renderPrev(t.dataset.prevFor),250)}
 });
