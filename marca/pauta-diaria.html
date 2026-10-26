@@ -193,6 +193,11 @@ const CRONOGRAMA=[
   {dia:5,nome:'sexta',linha:'noticia',tema:'Destaque da semana'}
 ];
 const HORARIOS='LinkedIn e X às 11h · Instagram e Facebook às 18h30';
+// Envio ao Metricool (conector do próprio visitante). Cada grupo vira um post no Metricool, no horário de pico da rede.
+const MC='Metricool Social Media Management',MC_BLOG='7650942',TZ='America/Sao_Paulo';
+const RAW='https://raw.githubusercontent.com/midiassociais-afk/licitamaisbrasil-redes/main/marca/saida/';
+const MC_REDES=[{id:'instagram',nome:'Instagram',hora:'18:30'},{id:'facebook',nome:'Facebook',hora:'18:30'},{id:'linkedin',nome:'LinkedIn',hora:'11:00'},{id:'twitter',nome:'X',hora:'11:00'}];
+let mcp=null;const mcState={};
 const AVATAR='logos/simbolo_colorido.png';
 const KIT=[
   {rede:'instagram',nome:'Instagram',arquivos:['Perfil_Todas_as_Redes_1080x1080.png'],destaques:true,passos:['No app, abra o perfil e toque em Editar perfil › Editar foto.','Envie Perfil_Todas_as_Redes_1080x1080.png.','Para cada destaque: toque e segure › Editar destaque › Editar capa › escolha o arquivo Destaque_….png correspondente.','Crie o destaque "Oportunidades" com a capa Destaque_Oportunidades.png.']},
@@ -330,6 +335,7 @@ function renderList(){
           <button class="btn" data-act="descartado" data-id="${id}" ${st==='descartado'||ocup?'disabled':''}>Descartar</button>
           ${st!=='pendente'?`<button class="btn" data-act="pendente" data-id="${id}" ${ocup}>Voltar a pendente</button>`:''}
         </div>`:'<div class="note">Você pode ver a pauta, mas não aprovar.</div>'}
+        ${st==='aprovado'?painelMetricool(i):''}
         ${salvando.has(i.id)?'<div class="note">Gravando…</div>':''}
         ${erros[i.id]?`<div class="erro" role="alert">${esc(erros[i.id])}</div>`:''}
         ${i.decididoEm&&st!=='pendente'?`<div class="note">Decisão gravada em ${esc(new Date(i.decididoEm).toLocaleString('pt-BR'))}</div>`:''}
@@ -350,6 +356,73 @@ function renderKit(){
       <label class="check"><input type="checkbox" id="kit-${k.rede}" data-act="kit" data-rede="${k.rede}" ${d.aplicado?'checked':''} ${canWrite?'':'disabled'}> Aplicado no ${esc(k.nome)}</label>
       ${d.aplicado&&d.em?`<span class="note">Marcado em ${esc(new Date(d.em).toLocaleString('pt-BR'))}</span>`:''}${erros['kit-'+k.rede]?`<div class="erro" role="alert">${esc(erros['kit-'+k.rede])}</div>`:''}</div>`}).join('')}</div></div>`;
 }
+/* ---------- envio ao Metricool ---------- */
+const publicas=i=>(i.imagensPublicas&&i.imagensPublicas.length)?i.imagensPublicas:(i.imagens||[]).map(p=>RAW+p);
+function proximoDiaUtil(){const d=new Date();d.setDate(d.getDate()+1);while([0,6].includes(d.getDay()))d.setDate(d.getDate()+1);return iso(d)}
+function estadoMc(i){
+  if(mcState[i.id])return mcState[i.id];
+  const temImg=publicas(i).length>0,f=(i.formatos||[]).join(' ');
+  const redes=new Set(['facebook']);if(temImg)redes.add('instagram');if(/LinkedIn/i.test(f))redes.add('linkedin');if(i.textoX)redes.add('twitter');
+  const data=i.dataPublicacao&&i.dataPublicacao>=iso(new Date())?i.dataPublicacao:proximoDiaUtil();
+  return mcState[i.id]={aberto:false,data,redes,modo:'rascunho',msg:'',erro:'',enviando:false};
+}
+function painelMetricool(i){
+  const s=estadoMc(i),id=esc(i.id),temImg=publicas(i).length>0,env=i.metricool;
+  const feito=env?`<div class="note"><b>${env.modo==='agendar'?'Agendado':'Rascunho criado'} no Metricool</b> em ${esc(new Date(env.enviadoEm).toLocaleString('pt-BR'))} para ${esc(fmtDia(env.data))}: ${esc((env.redes||[]).join(', '))}. Confira no <a href="https://app.metricool.com/planner" target="_blank" rel="noopener">planejador do Metricool</a>.</div>`:'';
+  if(!s.aberto)return `${feito}<div class="actions"><button class="btn" data-act="mc-abrir" data-id="${id}">${env?'Enviar de novo ao Metricool':'Enviar ao Metricool'}</button></div>`;
+  return `${feito}<div class="kitcard" style="padding:14px;gap:10px">
+    <b style="font-family:var(--f-tit)">Enviar ao Metricool</b>
+    <label class="lbl" for="mc-data-${id}">Dia da publicação</label><input type="date" id="mc-data-${id}" data-mc="data" data-id="${id}" value="${esc(s.data)}" min="${iso(new Date())}" style="font:14px var(--f-txt);padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg)">
+    <span class="lbl">Redes e horários</span>
+    <div style="display:grid;gap:4px">${MC_REDES.map(r=>{const bloq=r.id==='instagram'&&!temImg||r.id==='twitter'&&!i.textoX;
+      return `<label class="check" style="font-weight:500"><input type="checkbox" id="mc-${r.id}-${id}" data-mc="rede" data-rede="${r.id}" data-id="${id}" ${s.redes.has(r.id)&&!bloq?'checked':''} ${bloq?'disabled':''}> ${r.nome} às ${r.hora}${bloq?(r.id==='instagram'?' (precisa de imagem)':' (sem texto para o X)'):''}</label>`}).join('')}</div>
+    <span class="lbl">Modo</span>
+    <label class="check" style="font-weight:500"><input type="radio" name="mc-modo-${id}" id="mc-r-${id}" data-mc="modo" data-modo="rascunho" data-id="${id}" ${s.modo==='rascunho'?'checked':''}> Rascunho: fica no Metricool, nada é publicado (bom para testar)</label>
+    <label class="check" style="font-weight:500"><input type="radio" name="mc-modo-${id}" id="mc-a-${id}" data-mc="modo" data-modo="agendar" data-id="${id}" ${s.modo==='agendar'?'checked':''}> Agendar: o Metricool publica sozinho no dia e hora acima</label>
+    ${s.modo==='agendar'?'<div class="alerta">Atenção: no modo Agendar o post vai ao ar nas redes marcadas, sem nova confirmação.</div>':''}
+    ${s.erro?`<div class="erro" role="alert">${esc(s.erro)}</div>`:''}${s.msg?`<div class="note">${s.msg}</div>`:''}
+    <div class="actions"><button class="btn aprovar" data-act="mc-enviar" data-id="${id}" ${s.enviando||!mcp?'disabled':''}>${s.enviando?'Enviando…':(s.modo==='agendar'?'Agendar no Metricool':'Criar rascunho no Metricool')}</button><button class="btn" data-act="mc-fechar" data-id="${id}">Cancelar</button></div>
+    ${!mcp?'<div class="note">O envio ao Metricool funciona com a página aberta no claude.ai, com o conector do Metricool ligado na sua conta.</div>':''}
+  </div>`;
+}
+const msgMc=e=>{const c=e&&e.code;
+  if(c==='server_not_connected'||c==='needs_reauth')return 'O Metricool não está conectado na sua conta do Claude. Conecte em claude.ai › Configurações › Conectores e tente de novo.';
+  if(c==='not_in_manifest'||c==='approval_required'||c==='consent_required')return 'É preciso permitir que esta página use o Metricool. Clique em enviar de novo e aceite o pedido de permissão.';
+  if(c==='selection_required')return 'Há mais de um conector do Metricool na sua conta. Escolha qual usar no aviso do claude.ai.';
+  if(c==='tool_error'){const t=(e.result&&e.result.content||[]).map(b=>b.text).filter(Boolean).join(' ')||e.message;return 'O Metricool recusou o post: '+t}
+  if(c==='server_unavailable'||c==='upstream_error'||c==='cancelled')return 'O Metricool não respondeu a tempo. O post pode ter sido criado: confira no planejador do Metricool antes de enviar de novo.';
+  return 'Não foi possível enviar ('+(c||'erro')+').'};
+async function enviarMetricool(i){
+  const s=estadoMc(i),imgs=publicas(i),texto=i.legenda||i.titulo,grupos={};
+  if(!mcp){s.erro='Esta visualização não tem acesso ao Metricool.';return}
+  if(!s.redes.size){s.erro='Marque ao menos uma rede.';return}
+  MC_REDES.filter(r=>s.redes.has(r.id)).forEach(r=>{const k=r.id==='twitter'?'x':r.hora;(grupos[k]=grupos[k]||{hora:r.hora,redes:[]}).redes.push(r.id)});
+  const agora=new Date();
+  for(const g of Object.values(grupos)){const [h,m]=g.hora.split(':');const [y,mo,d]=s.data.split('-');if(new Date(+y,+mo-1,+d,+h,+m)<=agora){s.erro=`O horário das ${g.hora} de ${fmtDia(s.data)} já passou. Escolha outro dia.`;return}}
+  s.enviando=true;s.erro='';s.msg='';renderList();
+  const feitos=[];
+  try{
+    for(const g of Object.values(grupos)){
+      const x=g.redes.includes('twitter');
+      const info={autoPublish:true,draft:s.modo==='rascunho',descendants:[],firstCommentText:'',hasNotReadNotes:false,shortener:false,smartLinkData:{ids:[]},
+        text:x?(i.textoX||texto):texto,media:x?imgs.slice(0,1):imgs.slice(0,10),mediaAltText:[],
+        providers:g.redes.map(n=>({network:n})),publicationDate:{dateTime:`${s.data}T${g.hora}:00`,timezone:TZ}};
+      g.redes.forEach(n=>{if(n==='instagram')info.instagramData={type:'POST'};if(n==='facebook')info.facebookData={type:'POST'};if(n==='twitter')info.twitterData={tags:[]};
+        if(n==='linkedin')info.linkedinData=imgs.length>1?{type:'post',publishImagesAsPDF:true,documentTitle:(i.titulo||'Licita Mais Brasil').slice(0,100),previewIncluded:true}:{type:'post',previewIncluded:true}});
+      const r=await mcp.callTool(MC,'createScheduledPost',{blogId:MC_BLOG,date:`${s.data}T${g.hora}:00-03:00`,info:JSON.stringify(info)});
+      const p=r&&r.payload;const url=p&&(p.plannerUrl||(Array.isArray(p)&&p[0]&&p[0].plannerUrl)||(p.data&&p.data.plannerUrl));
+      feitos.push({redes:g.redes,hora:g.hora,url:url||''});
+    }
+  }catch(e){s.erro=msgMc(e)}
+  s.enviando=false;
+  if(feitos.length){
+    s.msg=feitos.map(f=>`${f.redes.map(n=>MC_REDES.find(r=>r.id===n).nome).join(' e ')} às ${f.hora}: ${s.modo==='agendar'?'agendado':'rascunho criado'}${f.url?` (<a href="${esc(f.url)}" target="_blank" rel="noopener">abrir no Metricool</a>)`:''}`).join('<br>');
+    try{await db.collection('itens').doc(i.id).update({metricool:{enviadoEm:new Date().toISOString(),modo:s.modo,data:s.data,redes:feitos.flatMap(f=>f.redes.map(n=>MC_REDES.find(r=>r.id===n).nome)),links:feitos.map(f=>f.url).filter(Boolean),por:me||''}})}catch(e){}
+    if(!s.erro)s.aberto=false;
+  }
+  renderList();
+}
+
 function renderSemana(){
   const ds=diasDaSemana(),hoje=iso(new Date());
   const fim=ds[4].obj.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}),ini=ds[0].obj.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
@@ -391,6 +464,8 @@ const decisao=(status,extra={})=>({status,decididoEm:new Date().toISOString(),de
 document.addEventListener('click',async ev=>{
   const b=ev.target.closest('[data-act]');if(!b||b.tagName==='INPUT')return;const id=b.dataset.id,act=b.dataset.act;
   if(act==='sem-nav'){semanaIni.setDate(semanaIni.getDate()+ +b.dataset.d);semanaIni=new Date(semanaIni);semanaItens=[];assinarSemana();renderSummary();renderList();return}
+  if(act==='mc-abrir'||act==='mc-fechar'){const i=itens.find(x=>x.id===id);if(i){const s=estadoMc(i);s.aberto=act==='mc-abrir';s.erro='';s.msg=''}renderList();return}
+  if(act==='mc-enviar'){const i=itens.find(x=>x.id===id);if(i)await enviarMetricool(i);renderList();return}
   if(act==='sem-tirar'){await gravar(id,{dataPublicacao:''},'Post retirado do dia');return}
   if(act==='sem-ver'){const i=[...semanaItens,...pool].find(x=>x.id===id);if(i){irPara=id;selectDia(i.dia)}return}
   if(act==='net'){prevState[id].net=b.dataset.net;prevState[id].slide=0;renderPrev(id);return}
@@ -405,6 +480,11 @@ document.addEventListener('click',async ev=>{
 });
 document.addEventListener('change',async ev=>{
   const t=ev.target;
+  if(t.dataset.mc){const s=mcState[t.dataset.id];if(!s)return;
+    if(t.dataset.mc==='data')s.data=t.value;
+    if(t.dataset.mc==='rede'){t.checked?s.redes.add(t.dataset.rede):s.redes.delete(t.dataset.rede)}
+    if(t.dataset.mc==='modo'){s.modo=t.dataset.modo;renderList()}
+    return}
   if(t.dataset.act==='sem-encaixar'){if(t.value)await gravar(t.value,{dataPublicacao:t.dataset.data},'Post encaixado em '+fmtDia(t.dataset.data));return}
   if(t.dataset.act!=='kit'||!db)return;const rede=t.dataset.rede;delete erros['kit-'+rede];
   try{await db.collection('kit').doc(rede).set({aplicado:t.checked,em:new Date().toISOString(),por:me||''});toast(t.checked?'Rede marcada como atualizada':'Marcação removida')}
@@ -426,6 +506,7 @@ function selectDia(d){
 renderAll();
 (async()=>{
   db=await claude.use('db');const user=await claude.use('user');
+  claude.use('mcp').then(m=>{mcp=m;if(dia&&dia!=='semana'&&dia!=='identidade')renderList()}).catch(()=>{});
   if(!db){$('sumTitle').textContent='Central indisponível';$('sumText').textContent='Entre na sua conta Claude com acesso a esta página para ver e aprovar as publicações.';return}
   try{me=user?await user.id():null;const c=user?await user.can('data.write'):null;if(c===false)canWrite=false}catch(e){}
   assinarSemana();
