@@ -1,0 +1,13 @@
+[
+{
+ "id": "2026-10-27-acordao-5037-2026-segunda-camara", "tema": "jurisprudencia", "arquivo": "2026-10-27-acordao-5037-2026-segunda-camara",
+ "slides": [
+  {"tipo": "capa", "kicker": "Jurisprudência · TCU", "titulo": "Taxa de administração zero na gestão de frota pode?", "sub": "Acórdão 5037/2026 – Segunda Câmara"},
+  {"tipo": "texto", "kicker": "O caso", "titulo": "Frota com rede credenciada", "texto": "Licitação de gerenciamento de frota com manutenção de veículos feita por uma rede de oficinas credenciadas.", "destaque": "Acórdão 5037/2026 – Segunda Câmara"},
+  {"tipo": "texto", "kicker": "O que o TCU entendeu", "titulo": "Taxa zero ou negativa é regular", "texto": "A gerenciadora também é remunerada pelo que cobra das oficinas credenciadas e pelos rendimentos dos repasses, não só pela taxa de administração."},
+  {"tipo": "texto", "kicker": "Taxa secundária", "titulo": "Repasse mínimo às oficinas", "texto": "Também é regular exigir que a gerenciadora repasse às oficinas um percentual mínimo do valor pago, limitando as comissões cobradas delas.", "destaque": "Evita compensar a taxa zero com comissões maiores"},
+  {"tipo": "lista", "kicker": "Na prática", "titulo": "Ao montar o edital de frota", "itens": ["Avalie aceitar taxa zero ou negativa", "Preveja o percentual mínimo de repasse", "Limite a taxa secundária das oficinas"], "destaque": "Enunciado do Boletim 606, não é resumo oficial"},
+  {"tipo": "cta", "titulo": "Licitar com segurança", "texto": "Acompanhe a jurisprudência com a Licita Mais Brasil.", "url": "licitamaisbrasil.com.br"}
+ ]
+}
+]

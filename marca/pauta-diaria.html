@@ -196,7 +196,10 @@ const HORARIOS='LinkedIn e X às 11h · Instagram e Facebook às 18h30';
 // Envio ao Metricool (conector do próprio visitante). Cada grupo vira um post no Metricool, no horário de pico da rede.
 const MC='Metricool Social Media Management',MC_BLOG='7650942',TZ='America/Sao_Paulo';
 const RAW='https://raw.githubusercontent.com/midiassociais-afk/licitamaisbrasil-redes/main/marca/saida/';
-const MC_REDES=[{id:'instagram',nome:'Instagram',hora:'18:30'},{id:'facebook',nome:'Facebook',hora:'18:30'},{id:'linkedin',nome:'LinkedIn',hora:'11:00'},{id:'twitter',nome:'X',hora:'11:00'}];
+const MC_REDES=[{id:'instagram',nome:'Instagram',hora:'18:30'},{id:'facebook',nome:'Facebook',hora:'18:30'},{id:'youtube',nome:'YouTube Shorts',hora:'18:30',soVideo:true},{id:'linkedin',nome:'LinkedIn',hora:'11:00'},{id:'twitter',nome:'X',hora:'11:00'}];
+// Vídeo (Reels/Shorts): gerado pela tarefa de produção de hora em hora a partir das telas, depois da aprovação
+const ehVideo=i=>/Reels|Short|Vídeo|Video/i.test((i.formatos||[]).join(' '));
+const videoPublico=i=>i.videoPublico||(i.video?RAW+i.video:'');
 let mcp=null;const mcState={};
 // Ajuste imediato: o Claude da conta de quem aprova reescreve o texto; a arte é refeita pela tarefa de ajustes (de hora em hora)
 let sampleFn=null;const ajState={};
@@ -285,6 +288,7 @@ const ICON={coracao:'<svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 
   salvar:'<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>'};
 function midia(i,st,tipo){
   const imgs=i.imagens||[];
+  if(i.video&&i.videoStatus==='pronto'&&tipo!=='li')return `<div class="media${tipo==='x'?' x':''}" style="aspect-ratio:9/16"><video src="${esc(i.video)}" ${i.videoCapa?`poster="${esc(i.videoCapa)}"`:''} controls playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover;display:block;background:#000"></video></div>`;
   if(!imgs.length){const L=LINHAS[i.linha]||{cor:'#28323B'};return `<div class="placeholder" style="--c:${L.cor}"><b>${esc(i.titulo)}</b><span>A arte é gerada depois da aprovação do texto.</span></div>`}
   const n=Math.min(st.slide,imgs.length-1);
   const nav=imgs.length>1?`${n>0?`<button class="nav p" data-act="slide" data-d="-1" data-id="${esc(i.id)}" aria-label="Tela anterior">‹</button>`:''}${n<imgs.length-1?`<button class="nav n" data-act="slide" data-d="1" data-id="${esc(i.id)}" aria-label="Próxima tela">›</button>`:''}`:'';
@@ -349,6 +353,7 @@ function renderList(){
           <button class="btn" data-act="descartado" data-id="${id}" ${st==='descartado'||ocup?'disabled':''}>Descartar</button>
           ${st!=='pendente'?`<button class="btn" data-act="pendente" data-id="${id}" ${ocup}>Voltar a pendente</button>`:''}
         </div>`:'<div class="note">Você pode ver a pauta, mas não aprovar.</div>'}
+        ${ehVideo(i)?blocoVideo(i):''}
         ${i.artePendente?`<div class="alerta">A arte está sendo refeita com o texto ajustado, ${AJ_HORARIO}. Até lá a prévia mostra a arte anterior e o envio ao Metricool fica bloqueado.</div>`:''}
         ${st==='aprovado'&&!i.artePendente?painelMetricool(i):''}
         ${salvando.has(i.id)?'<div class="note">Gravando…</div>':''}
@@ -379,6 +384,17 @@ function renderKit(){
       <label class="check"><input type="checkbox" id="kit-${k.rede}" data-act="kit" data-rede="${k.rede}" ${d.aplicado?'checked':''} ${canWrite?'':'disabled'}> Aplicado no ${esc(k.nome)}</label>
       ${d.aplicado&&d.em?`<span class="note">Marcado em ${esc(new Date(d.em).toLocaleString('pt-BR'))}</span>`:''}${erros['kit-'+k.rede]?`<div class="erro" role="alert">${esc(erros['kit-'+k.rede])}</div>`:''}</div>`}).join('')}</div></div>`;
 }
+/* ---------- vídeo (Reels / Shorts) ---------- */
+function blocoVideo(i){
+  const vs=i.videoStatus,id=esc(i.id),st=i.status||'pendente';
+  if(vs==='pronto')return `<div class="note"><b>Vídeo pronto</b>${i.videoDuracao?` · ${esc(i.videoDuracao)} s`:''} · 1080 × 1920. Assista na prévia ao lado.${canWrite?` <button class="btn mini" data-act="video-refazer" data-id="${id}">Gerar de novo</button>`:''}</div>`;
+  if(vs==='fila')return `<div class="alerta"><b>Vídeo na fila de produção.</b> Ele fica pronto ${AJ_HORARIO} e aparece aqui na prévia.</div>`;
+  if(vs==='gerando')return `<div class="alerta"><b>Gerando o vídeo agora.</b> Em alguns minutos ele aparece na prévia.</div>`;
+  if(vs==='erro')return `<div class="erro">Não foi possível gerar o vídeo: ${esc(i.videoErro||'erro desconhecido')}.${canWrite?` <button class="btn mini" data-act="video-refazer" data-id="${id}">Tentar de novo</button>`:''}</div>`;
+  if(st==='aprovado'&&canWrite)return `<div class="actions"><button class="btn" data-act="video-refazer" data-id="${id}">Gerar vídeo</button><span class="note">O vídeo é feito a partir das telas, ${AJ_HORARIO}.</span></div>`;
+  return `<div class="note">Ao aprovar, o vídeo vertical (Reels e Shorts) entra na fila de produção automaticamente.</div>`;
+}
+
 /* ---------- ajuste imediato ---------- */
 function promptAjuste(i,pedido){
   const atual={titulo:i.titulo,gancho:i.gancho||'',baseLegal:i.baseLegal||'',linha:i.linha,slides:i.slides||[],telas:i.telas||null,legenda:i.legenda||'',textoX:i.textoX??null};
@@ -448,11 +464,12 @@ async function aplicarAjuste(i){
 
 /* ---------- envio ao Metricool ---------- */
 const publicas=i=>(i.imagensPublicas&&i.imagensPublicas.length)?i.imagensPublicas:(i.imagens||[]).map(p=>RAW+p);
+const temVideo=i=>!!(i.video&&i.videoStatus==='pronto');
 function proximoDiaUtil(){const d=new Date();d.setDate(d.getDate()+1);while([0,6].includes(d.getDay()))d.setDate(d.getDate()+1);return iso(d)}
 function estadoMc(i){
   if(mcState[i.id])return mcState[i.id];
-  const temImg=publicas(i).length>0,f=(i.formatos||[]).join(' ');
-  const redes=new Set(['facebook']);if(temImg)redes.add('instagram');if(/LinkedIn/i.test(f))redes.add('linkedin');if(i.textoX)redes.add('twitter');
+  const temImg=publicas(i).length>0,f=(i.formatos||[]).join(' '),vid=temVideo(i);
+  const redes=new Set(['facebook']);if(temImg||vid)redes.add('instagram');if(/LinkedIn/i.test(f))redes.add('linkedin');if(i.textoX)redes.add('twitter');if(vid&&/YouTube|Short/i.test(f))redes.add('youtube');
   const data=i.dataPublicacao&&i.dataPublicacao>=iso(new Date())?i.dataPublicacao:proximoDiaUtil();
   return mcState[i.id]={aberto:false,data,redes,modo:'rascunho',msg:'',erro:'',enviando:false};
 }
@@ -464,8 +481,9 @@ function painelMetricool(i){
     <b style="font-family:var(--f-tit)">Enviar ao Metricool</b>
     <label class="lbl" for="mc-data-${id}">Dia da publicação</label><input type="date" id="mc-data-${id}" data-mc="data" data-id="${id}" value="${esc(s.data)}" min="${iso(new Date())}" style="font:14px var(--f-txt);padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg)">
     <span class="lbl">Redes e horários</span>
-    <div style="display:grid;gap:4px">${MC_REDES.map(r=>{const bloq=r.id==='instagram'&&!temImg||r.id==='twitter'&&!i.textoX;
-      return `<label class="check" style="font-weight:500"><input type="checkbox" id="mc-${r.id}-${id}" data-mc="rede" data-rede="${r.id}" data-id="${id}" ${s.redes.has(r.id)&&!bloq?'checked':''} ${bloq?'disabled':''}> ${r.nome} às ${r.hora}${bloq?(r.id==='instagram'?' (precisa de imagem)':' (sem texto para o X)'):''}</label>`}).join('')}</div>
+    ${temVideo(i)?'<div class="note">Vai como <b>vídeo</b>: Reels no Instagram e no Facebook, Shorts no YouTube.</div>':(ehVideo(i)?'<div class="alerta">O vídeo ainda não está pronto: se enviar agora, vão só as imagens. Para enviar o vídeo, espere ele aparecer na prévia.</div>':'')}
+    <div style="display:grid;gap:4px">${MC_REDES.filter(r=>!r.soVideo||temVideo(i)).map(r=>{const bloq=r.id==='instagram'&&!temImg&&!temVideo(i)||r.id==='twitter'&&!i.textoX;
+      return `<label class="check" style="font-weight:500"><input type="checkbox" id="mc-${r.id}-${id}" data-mc="rede" data-rede="${r.id}" data-id="${id}" ${s.redes.has(r.id)&&!bloq?'checked':''} ${bloq?'disabled':''}> ${r.nome} às ${r.hora}${bloq?(r.id==='instagram'?' (precisa de imagem ou vídeo)':' (sem texto para o X)'):''}</label>`}).join('')}</div>
     <span class="lbl">Modo</span>
     <label class="check" style="font-weight:500"><input type="radio" name="mc-modo-${id}" id="mc-r-${id}" data-mc="modo" data-modo="rascunho" data-id="${id}" ${s.modo==='rascunho'?'checked':''}> Rascunho: fica no Metricool, nada é publicado (bom para testar)</label>
     <label class="check" style="font-weight:500"><input type="radio" name="mc-modo-${id}" id="mc-a-${id}" data-mc="modo" data-modo="agendar" data-id="${id}" ${s.modo==='agendar'?'checked':''}> Agendar: o Metricool publica sozinho no dia e hora acima</label>
@@ -492,7 +510,7 @@ function lerCamposMc(i){
   return s;
 }
 function resumoMc(s){
-  const nomes=id=>MC_REDES.find(r=>r.id===id).nome,g11=[...s.redes].filter(r=>['linkedin','twitter'].includes(r)).map(nomes),g18=[...s.redes].filter(r=>['instagram','facebook'].includes(r)).map(nomes);
+  const nomes=id=>MC_REDES.find(r=>r.id===id).nome,g11=[...s.redes].filter(r=>['linkedin','twitter'].includes(r)).map(nomes),g18=[...s.redes].filter(r=>['instagram','facebook','youtube'].includes(r)).map(nomes);
   if(!g11.length&&!g18.length)return 'Nenhuma rede marcada.';
   return `${s.modo==='agendar'?'Vai ao ar':'Rascunho para'} <b>${esc(fmtDia(s.data))}</b>: ${[g11.length?`${g11.join(' e ')} às 11h`:'',g18.length?`${g18.join(' e ')} às 18h30`:''].filter(Boolean).join('; ')}.`;
 }
@@ -507,12 +525,17 @@ async function enviarMetricool(i){
   const feitos=[];
   try{
     for(const g of Object.values(grupos)){
-      const x=g.redes.includes('twitter');
+      const x=g.redes.includes('twitter'),vid=temVideo(i);
+      const midiaPost=vid?[videoPublico(i)]:(x?imgs.slice(0,1):imgs.slice(0,10));
       const info={autoPublish:true,draft:s.modo==='rascunho',descendants:[],firstCommentText:'',hasNotReadNotes:false,shortener:false,smartLinkData:{ids:[]},
-        text:x?(i.textoX||texto):texto,media:x?imgs.slice(0,1):imgs.slice(0,10),mediaAltText:[],
+        text:x?(i.textoX||texto):texto,media:midiaPost,mediaAltText:[],
         providers:g.redes.map(n=>({network:n})),publicationDate:{dateTime:`${s.data}T${g.hora}:00`,timezone:TZ}};
-      g.redes.forEach(n=>{if(n==='instagram')info.instagramData={type:'POST'};if(n==='facebook')info.facebookData={type:'POST'};if(n==='twitter')info.twitterData={tags:[]};
-        if(n==='linkedin')info.linkedinData=imgs.length>1?{type:'post',publishImagesAsPDF:true,documentTitle:(i.titulo||'Licita Mais Brasil').slice(0,100),previewIncluded:true}:{type:'post',previewIncluded:true}});
+      g.redes.forEach(n=>{
+        if(n==='instagram')info.instagramData=vid?{type:'REEL',showReelOnFeed:true}:{type:'POST'};
+        if(n==='facebook')info.facebookData=vid?{type:'REEL'}:{type:'POST'};
+        if(n==='youtube')info.youtubeData={title:(i.titulo||'Licita Mais Brasil').slice(0,100),type:'short',privacy:'public',madeForKids:false};
+        if(n==='twitter')info.twitterData={tags:[]};
+        if(n==='linkedin')info.linkedinData=!vid&&imgs.length>1?{type:'post',publishImagesAsPDF:true,documentTitle:(i.titulo||'Licita Mais Brasil').slice(0,100),previewIncluded:true}:{type:'post',previewIncluded:true}});
       const r=await mcp.callTool(MC,'createScheduledPost',{blogId:MC_BLOG,date:`${s.data}T${g.hora}:00-03:00`,info:JSON.stringify(info)});
       const p=r&&r.payload;const url=p&&(p.plannerUrl||(Array.isArray(p)&&p[0]&&p[0].plannerUrl)||(p.data&&p.data.plannerUrl));
       feitos.push({redes:g.redes,hora:g.hora,url:url||''});
@@ -568,6 +591,7 @@ const decisao=(status,extra={})=>({status,decididoEm:new Date().toISOString(),de
 document.addEventListener('click',async ev=>{
   const b=ev.target.closest('[data-act]');if(!b||b.tagName==='INPUT')return;const id=b.dataset.id,act=b.dataset.act;
   if(act==='sem-nav'){semanaIni.setDate(semanaIni.getDate()+ +b.dataset.d);semanaIni=new Date(semanaIni);semanaItens=[];assinarSemana();renderSummary();renderList();return}
+  if(act==='video-refazer'){await gravar(id,{videoStatus:'fila',videoPedidoEm:new Date().toISOString(),videoErro:''},'O vídeo entrou na fila de produção.');return}
   if(act==='copiar-texto'){const t=TEXTOS.find(x=>x.k===b.dataset.k);if(!t)return;
     try{await navigator.clipboard.writeText(t.texto);toast('Texto copiado: '+t.titulo)}
     catch(e){const el=$('txt-'+t.k);const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);toast('Texto selecionado: use Ctrl+C')}return}
@@ -586,7 +610,12 @@ document.addEventListener('click',async ev=>{
     await gravar(id,d,'Textos salvos');return}
   if(act==='ajustar'){const s=ajState[id]||(ajState[id]={});s.aberto=!s.aberto;const box=$('aj-'+id);box.hidden=!s.aberto;if(s.aberto)$('cm-'+id).focus();return}
   if(act==='enviar-ajuste'){const c=$('cm-'+id).value.trim();if(!c){toast('Escreva o que precisa mudar');return}await gravar(id,decisao('ajustar',{comentario:c}),'Pedido de ajuste enviado');return}
-  if(STATUS[act])await gravar(id,decisao(act,act==='pendente'?{comentario:''}:{}),'Marcado como '+STATUS[act].toLowerCase());
+  if(STATUS[act]){
+    const i=[...itens,...semanaItens].find(x=>x.id===id);const extra=act==='pendente'?{comentario:''}:{};
+    // Aprovar um post de vídeo põe o vídeo na fila de produção
+    if(act==='aprovado'&&i&&ehVideo(i)&&!['pronto','fila','gerando'].includes(i.videoStatus))Object.assign(extra,{videoStatus:'fila',videoPedidoEm:new Date().toISOString()});
+    await gravar(id,decisao(act,extra),act==='aprovado'&&extra.videoStatus==='fila'?'Aprovado. O vídeo entrou na fila de produção.':'Marcado como '+STATUS[act].toLowerCase());
+  }
 });
 document.addEventListener('change',async ev=>{
   const t=ev.target;

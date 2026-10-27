@@ -1,0 +1,12 @@
+[
+{
+ "id": "2026-10-27-bj-606", "tema": "jurisprudencia", "arquivo": "2026-10-27-bj-606-reels",
+ "slides": [
+  {"tipo": "capa", "kicker": "Boletim de Jurisprudência 606 · TCU", "titulo": "Planilha de obras e taxa zero na frota", "sub": "Duas decisões do TCU para quem licita"},
+  {"tipo": "texto", "kicker": "Acórdão 2788/2026 · Plenário", "titulo": "Desconto igual em toda a planilha", "texto": "Em obras por menor preço, é irregular exigir que a redução do último lance seja aplicada igualmente a todos os itens da planilha.", "destaque": "Lei 14.133/2021, arts. 5º e 59, § 3º"},
+  {"tipo": "texto", "kicker": "Acórdão 5037/2026 · Segunda Câmara", "titulo": "Taxa zero na gestão de frota", "texto": "É regular aceitar taxa de administração zero ou negativa e exigir repasse mínimo às oficinas credenciadas, limitando a taxa secundária.", "destaque": "Frota com manutenção por rede credenciada"},
+  {"tipo": "lista", "kicker": "Na prática", "titulo": "Revise seus editais", "itens": ["Obras: controle o preço global e os unitários relevantes", "Frota: avalie aceitar taxa zero ou negativa", "Frota: preveja o limite da taxa secundária"], "destaque": "Enunciados do Boletim 606, não são resumo oficial"},
+  {"tipo": "cta", "titulo": "Acompanhe a jurisprudência", "texto": "Toda terça, o resumo do Boletim do TCU.", "url": "licitamaisbrasil.com.br"}
+ ]
+}
+]

@@ -1,5 +1,6 @@
 // Renderiza carrosséis 1080x1350 a partir de um JSON de peças (ver reedicoes.json).
 // Uso: node render-carrossel.mjs <pecas.json> <pasta-saida> [id-opcional]
+// Com FORMATO=reels, gera telas verticais 1080x1920 com margens livres para a interface do Reels/Shorts.
 import { abrirNavegador } from './navegador.mjs';
 import { readFileSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -8,6 +9,11 @@ import path from 'node:path';
 const dir = path.dirname(fileURLToPath(import.meta.url));
 const [, , pecasPath, outDir = '../saida', soId] = process.argv;
 const pecas = JSON.parse(readFileSync(pecasPath, 'utf8')).filter(p => !soId || p.id === soId);
+const REELS = process.env.FORMATO === 'reels';
+const ALTURA = REELS ? 1920 : 1350;
+// No Reels, o topo (perfil) e a base (legenda e botões) ficam cobertos pela interface: o conteúdo desce para o meio
+const CSS_REELS = REELS ? `.logo{top:250px}.simb{top:220px}.plusbig{top:260px}
+.box{top:470px;bottom:430px}.box.capa{top:470px}.cta{top:380px}.foot{bottom:340px}` : '';
 
 const b64 = p => readFileSync(path.join(dir, p)).toString('base64');
 const img = nome => `data:image/png;base64,${b64(`../logos/${nome}.png`)}`;
@@ -26,7 +32,7 @@ const TEMAS = {
 TEMAS.noticia = TEMAS.legislacao; // notícias usam o layout claro de Legislação e dicas
 
 function tela(s, i, total, t) {
-  const rodape = `<div class="foot"><span>@licitamaisbrasil</span><span>${s.tipo === 'capa' ? 'Arraste para o lado →' : `${i + 1}/${total}`}</span></div><div class="bar"></div>`;
+  const rodape = `<div class="foot"><span>@licitamaisbrasil</span><span>${REELS ? '' : s.tipo === 'capa' ? 'Arraste para o lado →' : `${i + 1}/${total}`}</span></div><div class="bar"></div>`;
   const destaque = s.destaque ? `<div class="hl">${esc(s.destaque)}</div>` : '';
   let corpo;
   if (s.tipo === 'capa') corpo = `
@@ -54,7 +60,7 @@ function html(peca) {
   return `<!doctype html><html><head><meta charset="utf-8"><style>${FONTES}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#888}
-.tela{width:1080px;height:1350px;position:relative;overflow:hidden;background:${t.bg};color:${t.fg};font-family:Inter,sans-serif;--k:1}
+.tela{width:1080px;height:${ALTURA}px;position:relative;overflow:hidden;background:${t.bg};color:${t.fg};font-family:Inter,sans-serif;--k:1}
 .tela::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle,${t.dots} 3px,transparent 3px);background-size:44px 44px}
 .logo{position:absolute;left:56px;top:70px;height:92px;width:auto}
 .simb{position:absolute;left:40px;top:40px;width:190px;height:190px;object-fit:contain}
@@ -84,11 +90,12 @@ dt{color:#55636E}dd{margin:0;font-weight:600}
 .link{font:600 calc(32px*var(--k)) Inter;text-align:center;overflow-wrap:anywhere}
 .foot{position:absolute;left:90px;right:90px;bottom:58px;display:flex;justify-content:space-between;font:600 28px Poppins;color:${t.sub}}
 .bar{position:absolute;left:0;right:0;bottom:0;height:22px;background:linear-gradient(90deg,#21B24D 0 40%,#03A2E4 40% 60%,#FFC718 60% 100%)}
+${CSS_REELS}
 </style></head><body>${peca.slides.map((s, i) => tela(s, i, peca.slides.length, t)).join('')}</body></html>`;
 }
 
 const browser = await abrirNavegador();
-const page = await browser.newPage({ viewport: { width: 1080, height: 1350 }, deviceScaleFactor: 1 });
+const page = await browser.newPage({ viewport: { width: 1080, height: ALTURA }, deviceScaleFactor: 1 });
 for (const peca of pecas) {
   const pasta = path.resolve(outDir, peca.arquivo);
   mkdirSync(pasta, { recursive: true });

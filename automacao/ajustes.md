@@ -1,12 +1,12 @@
-# Ajustes rápidos · Licita Mais Brasil (tarefa na nuvem, de hora em hora)
+# Ajustes rápidos e vídeos · Licita Mais Brasil (tarefa na nuvem, de hora em hora)
 
-Você atende os ajustes pedidos na Central de publicações sem esperar a pauta do dia seguinte. **Não publique nem agende nada nas redes** e não use o conector do Metricool.
+Você atende os ajustes pedidos na Central de publicações sem esperar a pauta do dia seguinte e produz os vídeos (Reels/Shorts) dos posts aprovados. **Não publique nem agende nada nas redes** e não use o conector do Metricool.
 
 Central: https://claude.ai/artifact/4uYf84gjq1fJuMrFzqt7W3. Carregue as ferramentas com ToolSearch `select:ArtifactData,Artifact`.
 
 ## Passo 0 — Há algo a fazer?
-ArtifactData `query` em `itens` com where status == "ajustar" e, em outra consulta, where artePendente == true.
-Se as duas vierem vazias (ou só com itens de status "ajustar" cujo `comentario` começa com "Não foi possível atender"), responda "Nada a ajustar" e **termine imediatamente**, sem rodar mais nada.
+ArtifactData `query` em `itens` com where status == "ajustar"; em outra, where artePendente == true; e em outra, where videoStatus == "fila".
+Se as três vierem vazias (ou só com itens de status "ajustar" cujo `comentario` começa com "Não foi possível atender"), responda "Nada a fazer" e **termine imediatamente**, sem rodar mais nada.
 
 ## Passo 1 — Pedidos de ajuste (status "ajustar")
 Para cada item com `comentario` preenchido (exceto os que começam com "Não foi possível atender"):
@@ -32,5 +32,16 @@ Releia os itens com `artePendente == true` (inclui os do Passo 1). Para cada um:
 4. Publique as imagens na Central: Artifact `action:"read"` com a url da Central e depois `action:"publish"` com a mesma `url`, `file_path` = `marca/pauta-diaria.html` (sem alterar o arquivo), `root` = `marca/saida` e `files` = `[{"path":"<pai>/<nova pasta>/01.png"}, …]`. Não passe `capabilities` nem `icon`.
 5. ArtifactData `update` (if_version) no item: `imagens` = novos caminhos, `imagensPublicas` = `https://raw.githubusercontent.com/midiassociais-afk/licitamaisbrasil-redes/main/marca/saida/<caminho>` de cada imagem, `artePendente` = `{"__delete__": true}`, `arteAtualizadaEm` = agora. Se o item tinha `metricool` (já enviado), adicione ao campo `comentarioAtendido` a frase " (Atenção: reenvie ao Metricool; o post antigo usa a arte anterior.)".
 
+## Passo 3 — Vídeos na fila (videoStatus == "fila")
+Faça depois dos Passos 1 e 2, para o vídeo já sair com o texto ajustado. Para cada item:
+1. Update (if_version) com `videoStatus: "gerando"` e `videoIniciadoEm` = agora. A Central mostra isso na hora.
+2. Telas do vídeo: use `telas` do item. Se houver só a capa (item criado só para vídeo), monte as telas a partir de `roteiro` e `slides`: a capa; uma tela `texto` por ponto principal (para o Boletim, uma por acórdão: kicker "Acórdão NNNN/AAAA · Colegiado", título curto, texto com o entendimento em até 220 caracteres e destaque com a base legal); uma tela `lista` "Na prática"; e uma `cta` final. Grave essas telas no item (`telas` e `slides`), copiando números de acórdão exatamente como estão.
+3. Pasta = a pasta de `imagens[0]` (ou `pautas/<dia>/<doc_id>` se não houver imagens) + `-reels-<AAAAMMDDHHmm>`. Monte /tmp/lmb/reels.json com `[{"id":"<doc_id>","tema":"<linha>","arquivo":"<último trecho da pasta>","slides":<telas>}]` e rode:
+   `mkdir -p /tmp/lmb && cd marca/render && npm ci --no-audit --no-fund && (node -e "require('fs').accessSync(require('ffmpeg-static'))" || command -v ffmpeg || apt-get install -y ffmpeg) && node render-reels.mjs /tmp/lmb/reels.json ../saida/<pai> && cd ../..`
+   Saem `reels.mp4` (1080x1920, H.264) e `capa.jpg`. Anote a duração impressa na saída.
+4. Envie ao GitHub como no Passo 2 (mensagem "Vídeo: <doc_id>") e publique `<pai>/<pasta>/reels.mp4` e `<pai>/<pasta>/capa.jpg` na Central, do mesmo jeito que as imagens.
+5. Update (if_version): `video` = `<pai>/<pasta>/reels.mp4`, `videoCapa` = `<pai>/<pasta>/capa.jpg`, `videoPublico` = `https://raw.githubusercontent.com/midiassociais-afk/licitamaisbrasil-redes/main/marca/saida/<pai>/<pasta>/reels.mp4`, `videoDuracao` = segundos (número com uma casa), `videoStatus: "pronto"`, `videoProntoEm` = agora.
+Se algo falhar, grave `videoStatus: "erro"` e `videoErro` com o motivo em uma frase simples (a equipe vê na Central e pode pedir de novo).
+
 ## Fim
-Responda em até 3 linhas: quantos pedidos atendidos, quantas artes refeitas e o que falhou.
+Responda em até 3 linhas: quantos pedidos atendidos, quantas artes refeitas, quantos vídeos gerados e o que falhou.
