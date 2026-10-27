@@ -471,8 +471,16 @@ function estadoMc(i){
   const temImg=publicas(i).length>0,f=(i.formatos||[]).join(' '),vid=temVideo(i);
   const redes=new Set(['facebook']);if(temImg||vid)redes.add('instagram');if(/LinkedIn/i.test(f))redes.add('linkedin');if(i.textoX)redes.add('twitter');if(vid&&/YouTube|Short/i.test(f))redes.add('youtube');
   const data=i.dataPublicacao&&i.dataPublicacao>=iso(new Date())?i.dataPublicacao:proximoDiaUtil();
-  return mcState[i.id]={aberto:false,data,redes,modo:'rascunho',msg:'',erro:'',enviando:false};
+  return mcState[i.id]={aberto:false,data,redes,horas:Object.fromEntries(MC_REDES.map(r=>[r.id,horaSugerida(r.hora,data)])),modo:'rascunho',msg:'',erro:'',enviando:false};
 }
+// Se o horário padrão já passou no dia escolhido, sugere a próxima meia hora cheia (com 15 min de folga)
+function horaSugerida(hora,data){
+  const [h,m]=hora.split(':'),[y,mo,d]=data.split('-'),agora=new Date();
+  if(new Date(+y,+mo-1,+d,+h,+m)>agora)return hora;
+  const t=new Date(agora.getTime()+15*60000);let hh=t.getHours(),mm=t.getMinutes()<=30?30:0;if(mm===0)hh++;
+  return hh>23?hora:`${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
+}
+const fmtHora=h=>h.endsWith(':00')?(+h.slice(0,2))+'h':h.replace(':','h');
 function painelMetricool(i){
   const s=estadoMc(i),id=esc(i.id),temImg=publicas(i).length>0,env=i.metricool;
   const feito=env?`<div class="note"><b>${env.modo==='agendar'?'Agendado':'Rascunho criado'} no Metricool</b> em ${esc(new Date(env.enviadoEm).toLocaleString('pt-BR'))} para ${esc(fmtDia(env.data))}: ${esc((env.redes||[]).join(', '))}. Confira no <a href="https://app.metricool.com/planner" target="_blank" rel="noopener">planejador do Metricool</a>.</div>`:'';
@@ -483,7 +491,8 @@ function painelMetricool(i){
     <span class="lbl">Redes e horários</span>
     ${temVideo(i)?'<div class="note">Vai como <b>vídeo</b>: Reels no Instagram e no Facebook, Shorts no YouTube.</div>':(ehVideo(i)?'<div class="alerta">O vídeo ainda não está pronto: se enviar agora, vão só as imagens. Para enviar o vídeo, espere ele aparecer na prévia.</div>':'')}
     <div style="display:grid;gap:4px">${MC_REDES.filter(r=>!r.soVideo||temVideo(i)).map(r=>{const bloq=r.id==='instagram'&&!temImg&&!temVideo(i)||r.id==='twitter'&&!i.textoX;
-      return `<label class="check" style="font-weight:500"><input type="checkbox" id="mc-${r.id}-${id}" data-mc="rede" data-rede="${r.id}" data-id="${id}" ${s.redes.has(r.id)&&!bloq?'checked':''} ${bloq?'disabled':''}> ${r.nome} às ${r.hora}${bloq?(r.id==='instagram'?' (precisa de imagem ou vídeo)':' (sem texto para o X)'):''}</label>`}).join('')}</div>
+      return `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><label class="check" style="font-weight:500"><input type="checkbox" id="mc-${r.id}-${id}" data-mc="rede" data-rede="${r.id}" data-id="${id}" ${s.redes.has(r.id)&&!bloq?'checked':''} ${bloq?'disabled':''}> ${r.nome} às</label><input type="time" id="mc-h-${r.id}-${id}" data-mc="hora" data-id="${id}" value="${esc(s.horas[r.id])}" step="300" aria-label="Horário no ${r.nome}" ${bloq?'disabled':''} style="font:14px var(--f-txt);padding:3px 6px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg)">${s.horas[r.id]!==r.hora&&!bloq?`<span class="note" style="font-size:12px;padding:2px 8px">padrão ${r.hora}</span>`:''}${bloq?`<span style="font-size:13px;color:var(--muted)">${r.id==='instagram'?'(precisa de imagem ou vídeo)':'(sem texto para o X)'}</span>`:''}</div>`}).join('')}</div>
+    <div class="note" style="font-size:13px">Perdeu o horário? Mude a hora de cada rede acima. Quando o horário padrão já passou hoje, a Central sugere a próxima meia hora.</div>
     <span class="lbl">Modo</span>
     <label class="check" style="font-weight:500"><input type="radio" name="mc-modo-${id}" id="mc-r-${id}" data-mc="modo" data-modo="rascunho" data-id="${id}" ${s.modo==='rascunho'?'checked':''}> Rascunho: fica no Metricool, nada é publicado (bom para testar)</label>
     <label class="check" style="font-weight:500"><input type="radio" name="mc-modo-${id}" id="mc-a-${id}" data-mc="modo" data-modo="agendar" data-id="${id}" ${s.modo==='agendar'?'checked':''}> Agendar: o Metricool publica sozinho no dia e hora acima</label>
@@ -504,23 +513,25 @@ const msgMc=e=>{const c=e&&e.code;
 function lerCamposMc(i){
   const s=estadoMc(i),dt=$('mc-data-'+i.id);
   if(dt&&dt.value)s.data=dt.value;
+  MC_REDES.forEach(r=>{const h=$(`mc-h-${r.id}-${i.id}`);if(h&&/^\d\d:\d\d/.test(h.value))s.horas[r.id]=h.value.slice(0,5)});
   const marcadas=MC_REDES.filter(r=>{const c=$(`mc-${r.id}-${i.id}`);return c&&c.checked&&!c.disabled}).map(r=>r.id);
   if(document.getElementById(`mc-${MC_REDES[0].id}-${i.id}`))s.redes=new Set(marcadas);
   const ag=$('mc-a-'+i.id);if(ag)s.modo=ag.checked?'agendar':'rascunho';
   return s;
 }
 function resumoMc(s){
-  const nomes=id=>MC_REDES.find(r=>r.id===id).nome,g11=[...s.redes].filter(r=>['linkedin','twitter'].includes(r)).map(nomes),g18=[...s.redes].filter(r=>['instagram','facebook','youtube'].includes(r)).map(nomes);
-  if(!g11.length&&!g18.length)return 'Nenhuma rede marcada.';
-  return `${s.modo==='agendar'?'Vai ao ar':'Rascunho para'} <b>${esc(fmtDia(s.data))}</b>: ${[g11.length?`${g11.join(' e ')} às 11h`:'',g18.length?`${g18.join(' e ')} às 18h30`:''].filter(Boolean).join('; ')}.`;
+  const g={};MC_REDES.filter(r=>s.redes.has(r.id)).forEach(r=>{const h=s.horas[r.id];(g[h]=g[h]||[]).push(r.nome)});
+  const hs=Object.keys(g).sort();
+  if(!hs.length)return 'Nenhuma rede marcada.';
+  return `${s.modo==='agendar'?'Vai ao ar':'Rascunho para'} <b>${esc(fmtDia(s.data))}</b>: ${hs.map(h=>`${g[h].join(' e ')} às ${fmtHora(h)}`).join('; ')}.`;
 }
 async function enviarMetricool(i){
   const s=lerCamposMc(i),imgs=publicas(i),texto=i.legenda||i.titulo,grupos={};
   if(!mcp){s.erro='Esta visualização não tem acesso ao Metricool.';return}
   if(!s.redes.size){s.erro='Marque ao menos uma rede.';return}
-  MC_REDES.filter(r=>s.redes.has(r.id)).forEach(r=>{const k=r.id==='twitter'?'x':r.hora;(grupos[k]=grupos[k]||{hora:r.hora,redes:[]}).redes.push(r.id)});
+  MC_REDES.filter(r=>s.redes.has(r.id)).forEach(r=>{const h=s.horas[r.id],k=r.id==='twitter'?'x':h;(grupos[k]=grupos[k]||{hora:h,redes:[]}).redes.push(r.id)});
   const agora=new Date();
-  for(const g of Object.values(grupos)){const [h,m]=g.hora.split(':');const [y,mo,d]=s.data.split('-');if(new Date(+y,+mo-1,+d,+h,+m)<=agora){s.erro=`O horário das ${g.hora} de ${fmtDia(s.data)} já passou. Escolha outro dia.`;return}}
+  for(const g of Object.values(grupos)){const [h,m]=g.hora.split(':');const [y,mo,d]=s.data.split('-');if(new Date(+y,+mo-1,+d,+h,+m)<=agora){s.erro=`O horário das ${g.hora} de ${fmtDia(s.data)} já passou. Mude a hora da rede ou escolha outro dia.`;return}}
   s.enviando=true;s.erro='';s.msg='';renderList();
   const feitos=[];
   try{
@@ -621,6 +632,7 @@ document.addEventListener('change',async ev=>{
   const t=ev.target;
   if(t.dataset.mc){const i=itens.find(x=>x.id===t.dataset.id);if(!i)return;const s=lerCamposMc(i);
     if(t.dataset.mc==='modo'){renderList();return}
+    if(t.dataset.mc==='data'){MC_REDES.forEach(r=>s.horas[r.id]=horaSugerida(r.hora,s.data));renderList();return}
     const r=$('mc-resumo-'+t.dataset.id);if(r)r.innerHTML=resumoMc(s)+(s.modo==='agendar'?' O Metricool publica sozinho, sem nova confirmação.':'');
     return}
   if(t.dataset.act==='sem-encaixar'){if(t.value)await gravar(t.value,{dataPublicacao:t.dataset.data},'Post encaixado em '+fmtDia(t.dataset.data));return}
@@ -629,7 +641,7 @@ document.addEventListener('change',async ev=>{
   catch(e){erros['kit-'+rede]=msgErro(e);t.checked=!t.checked;renderList()}
 });
 document.addEventListener('input',ev=>{const t=ev.target;
-  if(t.dataset.mc==='data'){const i=itens.find(x=>x.id===t.dataset.id);if(i){const s=lerCamposMc(i);const r=$('mc-resumo-'+t.dataset.id);if(r)r.innerHTML=resumoMc(s)+(s.modo==='agendar'?' O Metricool publica sozinho, sem nova confirmação.':'')}}
+  if(t.dataset.mc==='data'||t.dataset.mc==='hora'){const i=itens.find(x=>x.id===t.dataset.id);if(i){const s=lerCamposMc(i);const r=$('mc-resumo-'+t.dataset.id);if(r)r.innerHTML=resumoMc(s)+(s.modo==='agendar'?' O Metricool publica sozinho, sem nova confirmação.':'')}}
   if(t.id&&t.id.startsWith('x-')){const c=document.querySelector(`.xc[data-for="${t.id}"]`);if(c){const n=[...t.value].length;c.textContent=n;c.style.color=n>280?'var(--bad-fg)':''}}
   if(t.dataset.prevFor){clearTimeout(t._p);t._p=setTimeout(()=>renderPrev(t.dataset.prevFor),250)}
 });
