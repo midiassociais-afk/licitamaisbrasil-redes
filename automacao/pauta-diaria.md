@@ -73,7 +73,33 @@ Não mostre valores (a lista não traz o valor estimado). Se o comando falhar, r
 `node automacao/coleta.mjs noticias > /tmp/lmb/news.json`. Para cada notícia dos últimos 10 dias com chave `news-<id>` não usada, crie um item: linha "novidade" (recurso, módulo, melhoria, integração; formatos ["Post feed","Carrossel","LinkedIn","X"]) ou "institucional" (evento, comunicado, fiscalização). Resuma sem copiar trechos longos. Fonte: {titulo:<título>, url:"https://licitamaisbrasil.com.br/"}.
 
 ## Passo 4 — Notícias do setor e legislação
-WebSearch (modo standard) sobre as últimas 48 h, por exemplo: "licitações notícia", "Lei 14.133 novidade", "PNCP", "Seges MGI instrução normativa contratações", "TCU licitação acórdão", "Diário Oficial decreto licitações". Abra as fontes promissoras com WebFetch e priorize órgãos oficiais (gov.br, planalto.gov.br, tcu.gov.br, in.gov.br, pncp.gov.br, TCEs). Escolha até 3 assuntos novos e úteis: `noticia` (fato) ou `legislacao` (norma nova), `chave:"noticia-<slug>"`, com fonte oficial. Descarte boatos, opinião e assuntos sem fonte oficial.
+WebSearch (modo standard) sobre as últimas 48 h, por exemplo: "licitações notícia", "Lei 14.133 novidade", "PNCP", "Seges MGI instrução normativa contratações", "Sicx compras expressas", "TCU licitação acórdão", "Diário Oficial decreto licitações". Abra as fontes promissoras com WebFetch e priorize órgãos oficiais (gov.br, planalto.gov.br, tcu.gov.br, in.gov.br, pncp.gov.br, TCEs). Escolha até 3 assuntos novos e úteis: `noticia` (fato) ou `legislacao` (norma nova), `chave:"noticia-<slug>"`, com fonte oficial. Descarte boatos, opinião e assuntos sem fonte oficial.
+
+Canais para consultar com WebFetch (peça as publicações dos últimos 7 dias, com título, data e link):
+- **Oficiais (podem ser fonte do post):**
+  - https://www.gov.br/compras/pt-br/assuntos/noticias (notícias do Portal de Compras/SEGES);
+  - https://www.gov.br/compras/pt-br/acesso-a-informacao/legislacao/instrucoes-normativas (INs novas: se houver uma IN de data recente, abra o texto);
+  - https://www.gov.br/pncp/pt-br/assuntos/noticias (PNCP);
+  - https://www.tce.sp.gov.br/noticias (TCE-SP, como exemplo de Tribunal de Contas estadual).
+- **Especializados (só para descobrir temas):**
+  - https://www.novaleilicitacao.com.br/ (Observatório da Nova Lei de Licitações; veja também a lista "Mais lidos", que mostra o que o público procura);
+  - https://zenite.blog.br/ (Zênite);
+  - https://justen.com.br/ (Informativo Justen).
+
+  O fato do post sempre tem que ser confirmado na norma ou no órgão oficial, e é esse link oficial que vai em `fontes`. Não copie trechos desses sites nem cite os autores como fonte.
+
+Se uma página não abrir, registre na fonte "Busca na web" da pauta e siga.
+
+### Temas que mais geram dúvidas (use para escolher a dica do Passo 5 e para o "Você sabia?" da quinta)
+- Sicx (Sistema de Compras Expressas, Decreto 13.106/2026): credenciamento do fornecedor e regulamentos que ainda faltam.
+- Registro de preços: adesão à ata ("carona"), inclusive de atas municipais.
+- Contratação direta: valores de dispensa atualizados por decreto a cada ano, inexigibilidade e credenciamento.
+- Fase de lances e proposta inexequível.
+- Recursos e impugnação: prazos e como recorrer.
+- Contratos: acréscimos e supressões (art. 125), reequilíbrio, reajuste e repactuação.
+- Primeiro pregão do fornecedor: Sicaf, habilitação e benefícios de ME/EPP.
+
+Antes de criar um item sobre um desses temas, confira se a chave não foi usada nos últimos 45 dias.
 
 ## Passo 5 — Dica perene
 De segunda a sexta, se não houver item `legislacao` hoje, crie 1 carrossel de dica prática sobre a Lei 14.133/2021 ou o PNCP, ligado ao momento do ano (PCA, fim do exercício, adesão a ata, credenciamento), `chave:"dica-<slug>"` não usada em 45 dias. Confirme o artigo abrindo https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14133.htm com WebFetch (o site do Planalto recusa curl a partir da nuvem) e coloque esse link nas fontes.
