@@ -151,6 +151,19 @@ select{font:13px var(--f-txt);color:var(--fg);background:var(--bg);border:1px so
 .crono .lin{display:grid;grid-template-columns:90px 1fr;gap:8px}
 .crono .lin b{font-family:var(--f-tit);font-weight:600}
 .agenda{font-size:13px;font-weight:600;color:var(--accent2)}
+/* ===== nova publicação ===== */
+.campo{font:14px var(--f-txt);padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);width:100%;box-sizing:border-box}
+.novagrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,380px);gap:16px;align-items:start}
+@media (max-width:900px){.novagrid{grid-template-columns:1fr}}
+.pergunta{display:grid;gap:4px}
+.pergunta b,.pergunta label{font-weight:600;font-size:14px}
+.telas{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.tela{aspect-ratio:4/5;background:var(--c);color:var(--t);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px;overflow:hidden;font-size:11.5px;line-height:1.35}
+.tela .k{font:600 9.5px var(--f-tit);text-transform:uppercase;letter-spacing:.06em;opacity:.85}
+.tela b{font:800 14px/1.15 var(--f-tit)}
+.tela.capa b{font-size:17px;margin-top:auto}
+.tela p,.tela ul{margin:0}.tela ul{padding-left:16px}
+.tela .d{margin-top:auto;background:#FFC718;color:#28323B;border-radius:6px;padding:4px 6px;font-weight:600}
 </style>
 
 <header>
@@ -227,7 +240,7 @@ const DESTAQUES=[['Jurisprudência','Destaque_Jurisprudencia.png'],['Legislaçã
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const fmtDia=d=>{if(d==='semana')return'Semana';if(d==='reedicao')return'Reedição';if(d==='identidade')return'Identidade';if(!/^\d{4}-\d{2}-\d{2}$/.test(d))return d;const[y,m,dd]=d.split('-');return new Date(+y,+m-1,+dd).toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})};
+const fmtDia=d=>{if(d==='semana')return'Semana';if(d==='nova')return'+ Nova publicação';if(d==='reedicao')return'Reedição';if(d==='identidade')return'Identidade';if(!/^\d{4}-\d{2}-\d{2}$/.test(d))return d;const[y,m,dd]=d.split('-');return new Date(+y,+m-1,+dd).toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})};
 let db=null,me=null,canWrite=true,dia=null,pautas=[],itens=[],kitDocs={},unsubItens=null;
 let semanaIni=segundaDe(new Date()),semanaItens=[],pool=[],unsubSemana=[],irPara=null;
 function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -243,7 +256,7 @@ const msgErro=e=>{const c=e&&e.code;return c==='invalid_argument'?'O servidor re
 /* ---------- topo e resumo ---------- */
 function renderDays(){
   const box=$('days');box.innerHTML='';
-  ['semana',...pautas.map(p=>p.id),'identidade'].forEach(id=>{const b=document.createElement('button');b.className='day';b.textContent=fmtDia(id);
+  ['semana','nova',...pautas.map(p=>p.id),'identidade'].forEach(id=>{const b=document.createElement('button');b.className='day';b.textContent=fmtDia(id);
     b.setAttribute('aria-pressed',id===dia?'true':'false');b.onclick=()=>selectDia(id);box.appendChild(b)});
 }
 function renderSummary(){
@@ -252,6 +265,9 @@ function renderSummary(){
     const ds=diasDaSemana();const aprov=ds.filter(d=>semanaItens.some(i=>i.dataPublicacao===d.data&&i.status==='aprovado')).length;const ocup=ds.filter(d=>semanaItens.some(i=>i.dataPublicacao===d.data)).length;
     $('counts').innerHTML=`<span class="pill ${aprov===5?'st-aprovado':'st-pendente'}">${aprov} de 5 dias aprovados</span><span class="pill st-pendente">${5-ocup} dia(s) sem post</span><span class="pill st-ajustar">${pool.length} sugestão(ões) sem dia</span>`;
     $('fontes').innerHTML='';$('filters').hidden=true;return}
+  if(dia==='nova'){$('sumTitle').textContent='Nova publicação a partir de uma ideia';
+    $('sumText').textContent='Escreva o tema. O Claude faz perguntas se faltar algo, monta a prévia das telas e dos textos e você pede mudanças até ficar bom. Ao criar, o post entra como pendente e a arte final fica pronta '+AJ_HORARIO+'.';
+    $('counts').innerHTML='';$('fontes').innerHTML='';$('filters').hidden=true;return}
   if(dia==='identidade'){$('sumTitle').textContent='Identidade visual das redes';
     $('sumText').textContent='Foto de perfil, capas e capas de destaques no padrão novo. As redes não permitem trocar esses itens por integração, então cada rede é atualizada à mão. Marque cada uma depois de aplicar.';
     const feitas=KIT.filter(k=>kitDocs[k.rede]?.aplicado).length;
@@ -267,7 +283,7 @@ function renderSummary(){
   $('fontes').innerHTML=(p.fontes||[]).map(f=>`<span class="fonte ${f.ok?'ok':'falha'}" title="${esc(f.nota||'')}">${esc(f.nome)}${f.ok?'':' · falhou'}</span>`).join('');
 }
 function renderFilters(){
-  $('filters').innerHTML='';
+  $('filters').innerHTML='';if(['semana','nova','identidade'].includes(dia))return;
   Object.keys(STATUS).forEach(k=>{const b=document.createElement('button');b.className='pill st-'+k;b.textContent=STATUS[k];
     b.setAttribute('aria-pressed',filtro.has(k)?'true':'false');
     b.onclick=()=>{filtro.has(k)?filtro.delete(k):filtro.add(k);renderFilters();renderList()};$('filters').appendChild(b)});
@@ -289,7 +305,7 @@ const ICON={coracao:'<svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 
 function midia(i,st,tipo){
   const imgs=i.imagens||[];
   if(i.video&&i.videoStatus==='pronto'&&tipo!=='li')return `<div class="media${tipo==='x'?' x':''}" style="aspect-ratio:9/16"><video src="${esc(i.video)}" ${i.videoCapa?`poster="${esc(i.videoCapa)}"`:''} controls playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover;display:block;background:#000"></video></div>`;
-  if(!imgs.length){const L=LINHAS[i.linha]||{cor:'#28323B'};return `<div class="placeholder" style="--c:${L.cor}"><b>${esc(i.titulo)}</b><span>A arte é gerada depois da aprovação do texto.</span></div>`}
+  if(!imgs.length){const L=LINHAS[i.linha]||{cor:'#28323B'};return `<div class="placeholder" style="--c:${L.cor}"><b>${esc(i.titulo)}</b><span>${i.id===NOVA_ID?'Esboço: a arte final é feita depois de criar a publicação.':i.artePendente?'A arte está em produção.':'A arte é gerada depois da aprovação do texto.'}</span></div>`}
   const n=Math.min(st.slide,imgs.length-1);
   const nav=imgs.length>1?`${n>0?`<button class="nav p" data-act="slide" data-d="-1" data-id="${esc(i.id)}" aria-label="Tela anterior">‹</button>`:''}${n<imgs.length-1?`<button class="nav n" data-act="slide" data-d="1" data-id="${esc(i.id)}" aria-label="Próxima tela">›</button>`:''}`:'';
   if(tipo==='x')return `<div class="media x"><img src="${esc(imgs[0])}" alt="Imagem do post"></div>`;
@@ -311,13 +327,14 @@ function previa(i){
   else corpo=`<div class="mock"><div class="mh"><img src="${AVATAR}" alt=""><div><b>Licita Mais Brasil</b><small>YouTube</small></div></div><div class="ytnote">Vídeo: o roteiro está na coluna ao lado. A prévia aparece quando o vídeo for editado.</div></div>`;
   return `<div class="prev"><div class="nets" role="tablist" aria-label="Prévia por rede">${redes.map(r=>`<button class="net" role="tab" aria-selected="${r===st.net}" data-act="net" data-net="${r}" data-id="${esc(i.id)}">${NOMES[r]}</button>`).join('')}</div>${corpo}</div>`;
 }
-function renderPrev(id){const i=itens.find(x=>x.id===id);const box=document.querySelector(`[data-prev="${CSS.escape(id)}"]`);if(i&&box)box.innerHTML=previa(i)}
+function renderPrev(id){const i=id===NOVA_ID?(nova.proposta&&novaItem()):itens.find(x=>x.id===id);const box=document.querySelector(`[data-prev="${CSS.escape(id)}"]`);if(i&&box)box.innerHTML=previa(i)}
 
 /* ---------- lista ---------- */
 function renderList(){
   const box=$('list');
   if(dia==='identidade'){renderKit();return}
   if(dia==='semana'){renderSemana();return}
+  if(dia==='nova'){renderNova();return}
   const open=new Set([...box.querySelectorAll('details[open]')].map(d=>d.dataset.k));
   const drafts={};box.querySelectorAll('textarea').forEach(t=>drafts[t.id]=t.value);
   const vis=itens.filter(i=>filtro.has(i.status||'pendente')).sort((a,b)=>(b.prioridade||0)-(a.prioridade||0)||String(a.id).localeCompare(b.id));
@@ -354,7 +371,8 @@ function renderList(){
           ${st!=='pendente'?`<button class="btn" data-act="pendente" data-id="${id}" ${ocup}>Voltar a pendente</button>`:''}
         </div>`:'<div class="note">Você pode ver a pauta, mas não aprovar.</div>'}
         ${ehVideo(i)?blocoVideo(i):''}
-        ${i.artePendente?`<div class="alerta">A arte está sendo refeita com o texto ajustado, ${AJ_HORARIO}. Até lá a prévia mostra a arte anterior e o envio ao Metricool fica bloqueado.</div>`:''}
+        ${i.artePendente&&!(i.imagens||[]).length?`<div class="alerta">A arte está sendo produzida e fica pronta ${AJ_HORARIO}. O envio ao Metricool é liberado depois disso.</div>`:''}
+        ${i.artePendente&&(i.imagens||[]).length?`<div class="alerta">A arte está sendo refeita com o texto ajustado, ${AJ_HORARIO}. Até lá a prévia mostra a arte anterior e o envio ao Metricool fica bloqueado.</div>`:''}
         ${st==='aprovado'&&!i.artePendente?painelMetricool(i):''}
         ${salvando.has(i.id)?'<div class="note">Gravando…</div>':''}
         ${erros[i.id]?`<div class="erro" role="alert">${esc(erros[i.id])}</div>`:''}
@@ -460,6 +478,137 @@ async function aplicarAjuste(i){
   if(p.textoX!=null)dados.textoX=String(p.textoX);
   if(p.mudouArte&&(i.imagens||[]).length)dados.artePendente=true;
   if(await gravar(i.id,dados,'Ajuste aplicado. Confira e aprove de novo.')){delete ajState[i.id];if(mcState[i.id])delete mcState[i.id];renderList()}
+}
+
+/* ---------- nova publicação a partir de uma ideia ---------- */
+// O Claude de quem está na página conversa sobre a ideia e monta a proposta; ao criar, a tarefa de hora em hora renderiza a arte (artePendente)
+const NOVA_ID='nova-previa';
+const FORMATOS_NOVA={
+  carrossel:{nome:'Carrossel: Instagram, Facebook, LinkedIn e X',formatos:['Carrossel','LinkedIn','X']},
+  reels:{nome:'Reels e Shorts: vídeo vertical feito das telas',formatos:['Reels','Short','X']},
+  ambos:{nome:'Carrossel e Reels',formatos:['Carrossel','Reels','Short','LinkedIn','X']}
+};
+const NOVA_VAZIA={ideia:'',linha:'auto',formato:'carrossel',fonte:'',data:'',rodadas:[],perguntas:[],respostas:{},proposta:null,mudanca:''};
+let nova={...NOVA_VAZIA,carregando:false,criando:false,erro:''};
+try{const r=JSON.parse(localStorage.getItem('nova-pub')||'null');if(r&&typeof r==='object')Object.assign(nova,r)}catch(e){}
+function guardarNova(){const {carregando,criando,erro,...g}=nova;try{localStorage.setItem('nova-pub',JSON.stringify(g))}catch(e){}}
+function lerNova(){
+  document.querySelectorAll('[data-nova]').forEach(el=>{const k=el.dataset.nova;
+    if(k==='resp')nova.respostas[el.dataset.k]=el.value;
+    else if(el.type==='radio'){if(el.checked)nova[k]=el.value}
+    else nova[k]=el.value});
+  guardarNova();
+}
+function promptNova(modo){
+  const p=nova.proposta;
+  const conversa=nova.rodadas.map(r=>r.perguntas.map((q,j)=>`P: ${q}\nR: ${(r.respostas[j]||'').trim()||'(sem resposta: decida você, sem inventar fatos)'}`).join('\n')).join('\n');
+  return `Você cria posts para as redes sociais da Licita Mais Brasil, plataforma de licitações eletrônicas integrada ao PNCP, no ar desde 2021. Público: órgãos públicos (pregoeiros, agentes de contratação, gestores), fornecedores e quem acompanha licitações.
+Voz: tecnologia com confiança. Benefício antes do recurso; frases curtas e voz ativa; trate por "você" ou "seu órgão"; escreva "Licita Mais Brasil" por extenso; cite a base legal (Lei 14.133/2021, PNCP) quando ajudar; termine com chamada para a plataforma. Evite juridiquês sem explicação, superlativos vazios e caixa alta; no máximo 2 emojis na legenda.
+Não invente fatos, números, datas, nomes de órgãos, números de acórdãos nem artigos de lei. Use só o que está na ideia, nas respostas e o que é amplamente estabelecido na Lei 14.133/2021. O que precisar ser conferido numa fonte antes de publicar vai em "conferir".
+
+IDEIA: ${nova.ideia.trim()}
+LINHA EDITORIAL: ${nova.linha==='auto'?'escolha a mais adequada entre jurisprudencia, legislacao, novidade, institucional e noticia':nova.linha}
+FORMATO: ${FORMATOS_NOVA[nova.formato].nome}
+FONTE INDICADA: ${nova.fonte.trim()||'nenhuma'}
+${conversa?`CONVERSA ATÉ AGORA:\n${conversa}\n`:''}${modo==='mudar'?`PROPOSTA ATUAL (JSON):\n${JSON.stringify(p)}\n\nPEDIDO DE MUDANÇA: ${nova.mudanca.trim()}\nAplique só o que o pedido pede e mantenha o resto.\n`:''}
+TAREFA: ${modo==='inicio'||modo==='responder'
+  ?'Se faltar informação essencial para um post correto e útil (o ângulo, o público, um fato ou dado específico que você não pode inventar), responda só {"perguntas":["até 3 perguntas curtas e objetivas, em português"]}. Não pergunte o que você mesmo pode decidir bem. Se já der para fazer um bom post, responda com a proposta.'
+  :'Responda com a proposta. Não faça perguntas.'}
+
+Formato da proposta:
+{"proposta":{"titulo":"…","gancho":"uma frase que resume o post","linha":"…","baseLegal":"base legal citada ou vazio","slides":["texto corrido de cada tela, título na primeira linha"],"telas":[…],"legenda":"…","textoX":"…","conferir":["o que conferir antes de publicar"],"resumo":"uma frase sobre a abordagem escolhida"}}
+Telas (uma por imagem; 4 a 7 telas):
+- {"tipo":"capa","kicker":"…","titulo":"até 70 caracteres","sub":"até 90"}: sempre a primeira
+- {"tipo":"texto","kicker":"…","titulo":"até 50","texto":"até 220","destaque":"opcional"}
+- {"tipo":"lista","kicker":"…","titulo":"até 50","itens":["2 a 4 itens de até 70"],"destaque":"opcional"}
+- {"tipo":"cta","titulo":"…","texto":"…","url":"licitamaisbrasil.com.br"}: sempre a última
+"slides" tem uma entrada por tela, com o mesmo texto das telas. "legenda": até 1.200 caracteres, com 3 a 6 hashtags no fim. "textoX": até 270 caracteres, sem emojis.`;
+}
+async function pedirNova(modo){
+  nova.carregando=true;nova.erro='';renderList();
+  try{
+    const r=await sampleFn.json(promptNova(modo),{modelTier:'complex',cache:false});
+    if(r&&Array.isArray(r.perguntas)&&r.perguntas.length&&(modo==='inicio'||modo==='responder')){nova.perguntas=r.perguntas.slice(0,3).map(String);nova.respostas={}}
+    else{
+      const p=r&&r.proposta;
+      if(!p||!p.titulo||!Array.isArray(p.telas)||!p.telas.length||!p.telas.every(t=>t&&t.tipo))throw{code:'invalid_json'};
+      if(!LINHAS[p.linha])p.linha=nova.linha!=='auto'?nova.linha:'legislacao';
+      if(!Array.isArray(p.slides)||p.slides.length!==p.telas.length)p.slides=p.telas.map(t=>[t.titulo,t.sub||t.texto||(t.itens||[]).join('; '),t.destaque].filter(Boolean).join('\n'));
+      nova.proposta=p;nova.perguntas=[];nova.respostas={};if(modo==='mudar')nova.mudanca='';delete prevState[NOVA_ID];
+    }
+  }catch(e){nova.erro=msgSample(e).replace(/ Use "Deixar para a tarefa"\.| ou use "Deixar para a tarefa"/g,'')}
+  nova.carregando=false;guardarNova();renderList();
+}
+function novaItem(){const p=nova.proposta;return {id:NOVA_ID,titulo:p.titulo,linha:p.linha,formatos:FORMATOS_NOVA[nova.formato].formatos,legenda:p.legenda||'',textoX:p.textoX??'',imagens:[]}}
+function telaMock(t,linha){
+  const cor=(LINHAS[linha]||{cor:'#28323B'}).cor,texto=linha==='legislacao'?'#28323B':'#fff';
+  const corpo=t.tipo==='lista'?`<ul>${(t.itens||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:`<p>${esc(t.texto||t.sub||'')}</p>`;
+  return `<div class="tela ${esc(t.tipo)}" style="--c:${cor};--t:${texto}">${t.kicker?`<span class="k">${esc(t.kicker)}</span>`:''}<b>${esc(t.titulo||'')}</b>${corpo}${t.destaque?`<span class="d">${esc(t.destaque)}</span>`:''}${t.tipo==='cta'?`<span class="d">${esc(t.url||'licitamaisbrasil.com.br')}</span>`:''}</div>`;
+}
+function renderNova(){
+  const box=$('list'),p=nova.proposta,ocup=nova.carregando||nova.criando;
+  if(!canWrite){box.innerHTML='<div class="empty"><b>Sem permissão para criar publicações</b><span>Peça acesso de edição a esta página.</span></div>';return}
+  const form=`<div class="kitcard">
+    <h3>1. Sua ideia</h3>
+    <label class="lbl" for="nova-ideia" style="margin-top:0">Tema ou ideia da publicação</label>
+    <textarea id="nova-ideia" data-nova="ideia" style="min-height:110px" placeholder="Ex.: explicar em poucos passos como o fornecedor se cadastra na plataforma e participa do primeiro pregão.">${esc(nova.ideia)}</textarea>
+    <div class="kitgrid" style="gap:12px">
+      <div><label class="lbl" for="nova-linha">Linha editorial</label><select id="nova-linha" data-nova="linha"><option value="auto">O Claude escolhe</option>${Object.entries(LINHAS).filter(([k])=>k!=='oportunidade').map(([k,l])=>`<option value="${k}" ${nova.linha===k?'selected':''}>${esc(l.nome)}</option>`).join('')}</select></div>
+      <div><label class="lbl" for="nova-data">Dia de publicação (opcional)</label><input type="date" class="campo" id="nova-data" data-nova="data" value="${esc(nova.data)}" min="${iso(new Date())}"></div>
+    </div>
+    <span class="lbl">Formato</span>
+    <div style="display:grid;gap:4px">${Object.entries(FORMATOS_NOVA).map(([k,f])=>`<label class="check" style="font-weight:500"><input type="radio" name="nova-formato" data-nova="formato" value="${k}" ${nova.formato===k?'checked':''}> ${esc(f.nome)}</label>`).join('')}</div>
+    <label class="lbl" for="nova-fonte">Link ou fonte (opcional)</label>
+    <input class="campo" id="nova-fonte" data-nova="fonte" value="${esc(nova.fonte)}" placeholder="Notícia, acórdão, lei ou página da plataforma">
+    <div class="actions"><button class="btn aprovar" data-act="nova-iniciar" ${ocup||!sampleFn?'disabled':''}>${nova.carregando&&!nova.rodadas.length&&!p?'Pensando…':(p||nova.perguntas.length?'Recomeçar com esta ideia':'Conversar com o Claude')}</button>${nova.ideia||p?`<button class="btn" data-act="nova-limpar" ${ocup?'disabled':''}>Limpar tudo</button>`:''}</div>
+    ${sampleFn?'':'<div class="note">A conversa com o Claude funciona com a página aberta no claude.ai, na sua conta. Se acabou de abrir, aguarde alguns segundos.</div>'}
+  </div>`;
+  const conversa=nova.rodadas.length||nova.perguntas.length?`<div class="kitcard">
+    <h3>2. Perguntas do Claude</h3>
+    ${nova.rodadas.map(r=>r.perguntas.map((q,j)=>`<div class="pergunta"><b>${esc(q)}</b><span class="note">${esc((r.respostas[j]||'').trim()||'(sem resposta)')}</span></div>`).join('')).join('')}
+    ${nova.perguntas.map((q,j)=>`<div class="pergunta"><label for="nova-r${j}">${esc(q)}</label><textarea id="nova-r${j}" data-nova="resp" data-k="${j}" style="min-height:60px">${esc(nova.respostas[j]||'')}</textarea></div>`).join('')}
+    ${nova.perguntas.length?`<div class="actions"><button class="btn aprovar" data-act="nova-responder" ${ocup?'disabled':''}>${nova.carregando?'Pensando…':'Responder'}</button><button class="btn" data-act="nova-gerar" ${ocup?'disabled':''}>Fazer a prévia sem responder</button></div><p class="note" style="margin:0">Pode deixar alguma em branco: o Claude decide sem inventar fatos.</p>`:''}
+  </div>`:'';
+  const L=p&&(LINHAS[p.linha]||{nome:p.linha});
+  const proposta=p?`<div class="kitcard" style="border-color:var(--accent)">
+    <h3>3. Prévia</h3>
+    <div class="novagrid"><div style="display:grid;gap:12px;align-content:start;min-width:0">
+      <div class="row"><span class="tag">${esc(L.nome)}</span>${FORMATOS_NOVA[nova.formato].formatos.map(f=>`<span class="tag">${esc(f)}</span>`).join('')}</div>
+      <h3 style="font-size:20px">${esc(p.titulo)}</h3>
+      ${p.gancho?`<p class="gancho">${esc(p.gancho)}</p>`:''}
+      ${p.resumo?`<p class="note" style="margin:0">${esc(p.resumo)}</p>`:''}
+      ${p.baseLegal?`<div class="note"><b>Base:</b> ${esc(p.baseLegal)}</div>`:''}
+      ${(p.conferir||[]).length?`<div class="alerta"><b>Conferir antes de publicar:</b>\n${p.conferir.map(c=>'• '+esc(c)).join('\n')}</div>`:''}
+      <div class="telas">${p.telas.map(t=>telaMock(t,p.linha)).join('')}</div>
+      <p class="note" style="margin:0">Esboço das telas. A arte final, no padrão da marca${/Reels/.test(FORMATOS_NOVA[nova.formato].formatos.join())?' (e o vídeo, depois da aprovação)':''}, é produzida ${AJ_HORARIO} depois de criar.</p>
+      <label class="lbl" for="nova-mudanca">Quer mudar algo?</label>
+      <textarea id="nova-mudanca" data-nova="mudanca" style="min-height:70px" placeholder="Ex.: deixe a capa mais curta e troque a tela 3 por um exemplo prático.">${esc(nova.mudanca)}</textarea>
+      <div class="actions"><button class="btn" data-act="nova-mudar" ${ocup?'disabled':''}>${nova.carregando?'Refazendo…':'Refazer com a mudança'}</button><button class="btn aprovar" data-act="nova-criar" ${ocup?'disabled':''}>${nova.criando?'Criando…':'Criar publicação'}</button></div>
+      <p class="note" style="margin:0">Ao criar, o post entra como <b>pendente</b> na pauta de hoje${nova.data?` e já encaixado em ${esc(fmtDia(nova.data))}`:'; encaixe o dia na aba Semana'}. Você ainda revisa e aprova como os demais.</p>
+    </div><div data-prev="${NOVA_ID}">${previa(novaItem())}</div></div>
+  </div>`:'';
+  box.innerHTML=`<div class="kit">${form}${conversa}${nova.erro?`<div class="erro" role="alert">${esc(nova.erro)}</div>`:''}${proposta}</div>`;
+}
+const slugNova=s=>String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40).replace(/-$/,'');
+async function criarNova(){
+  const p=nova.proposta;if(!p)return;
+  if(!db){nova.erro='Banco indisponível nesta visualização.';renderList();return}
+  const agora=new Date(),hoje=iso(agora),id=`${hoje}-central-${slugNova(p.titulo)||'post'}-${String(agora.getHours()).padStart(2,'0')}${String(agora.getMinutes()).padStart(2,'0')}`;
+  const doc={id,dia:hoje,titulo:String(p.titulo),gancho:String(p.gancho||''),linha:p.linha,formatos:FORMATOS_NOVA[nova.formato].formatos,prioridade:3,
+    slides:p.slides.map(String),telas:p.telas,legenda:String(p.legenda||''),textoX:String(p.textoX??''),baseLegal:String(p.baseLegal||''),
+    fontes:nova.fonte.trim()?[{titulo:'Fonte indicada na Central',url:nova.fonte.trim()}]:[],
+    roteiro:(p.conferir||[]).length?'Antes de publicar: '+p.conferir.join(' · '):'',
+    ideia:nova.ideia.trim(),origem:'central',status:'pendente',artePendente:true,criadoEm:agora.toISOString(),criadoPor:me||''};
+  if(nova.data)doc.dataPublicacao=nova.data;
+  nova.criando=true;nova.erro='';renderList();
+  try{
+    const pd=db.collection('pautas').doc(hoje);
+    if(!(await pd.get()).exists)await pd.set({id:hoje,titulo:'Pauta de '+fmtDia(hoje),resumo:'Publicações criadas na Central.',fontes:[]});
+    await db.collection('itens').doc(id).set(doc);
+    nova={...NOVA_VAZIA,carregando:false,criando:false,erro:''};guardarNova();
+    toast('Publicação criada. A arte fica pronta '+AJ_HORARIO+'.');irPara=id;selectDia(hoje);return;
+  }catch(e){nova.erro=msgErro(e)}
+  nova.criando=false;renderList();
 }
 
 /* ---------- envio ao Metricool ---------- */
@@ -606,6 +755,14 @@ document.addEventListener('click',async ev=>{
   if(act==='copiar-texto'){const t=TEXTOS.find(x=>x.k===b.dataset.k);if(!t)return;
     try{await navigator.clipboard.writeText(t.texto);toast('Texto copiado: '+t.titulo)}
     catch(e){const el=$('txt-'+t.k);const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);toast('Texto selecionado: use Ctrl+C')}return}
+  if(act==='nova-iniciar'){lerNova();if(!nova.ideia.trim()){nova.erro='Escreva a ideia da publicação.';renderList();return}
+    Object.assign(nova,{rodadas:[],perguntas:[],respostas:{},proposta:null,mudanca:''});await pedirNova('inicio');return}
+  if(act==='nova-responder'||act==='nova-gerar'){lerNova();
+    if(nova.perguntas.length){nova.rodadas.push({perguntas:nova.perguntas,respostas:{...nova.respostas}});nova.perguntas=[];nova.respostas={}}
+    await pedirNova(act==='nova-responder'&&nova.rodadas.length<2?'responder':'gerar');return}
+  if(act==='nova-mudar'){lerNova();if(!nova.mudanca.trim()){nova.erro='Escreva o que quer mudar.';renderList();return}await pedirNova('mudar');return}
+  if(act==='nova-criar'){lerNova();await criarNova();return}
+  if(act==='nova-limpar'){nova={...NOVA_VAZIA,carregando:false,criando:false,erro:''};delete prevState[NOVA_ID];guardarNova();renderList();return}
   if(act==='aj-agora'){const i=itens.find(x=>x.id===id);if(i&&sampleFn)await ajustarAgora(i);return}
   if(act==='aj-aplicar'){const i=itens.find(x=>x.id===id);if(i&&ajState[id]?.proposta)await aplicarAjuste(i);return}
   if(act==='aj-descartar'){if(ajState[id]){ajState[id].proposta=null}renderList();return}
@@ -641,6 +798,7 @@ document.addEventListener('change',async ev=>{
   catch(e){erros['kit-'+rede]=msgErro(e);t.checked=!t.checked;renderList()}
 });
 document.addEventListener('input',ev=>{const t=ev.target;
+  if(t.dataset.nova){clearTimeout(lerNova._t);lerNova._t=setTimeout(lerNova,300)}
   if(t.dataset.mc==='data'||t.dataset.mc==='hora'){const i=itens.find(x=>x.id===t.dataset.id);if(i){const s=lerCamposMc(i);const r=$('mc-resumo-'+t.dataset.id);if(r)r.innerHTML=resumoMc(s)+(s.modo==='agendar'?' O Metricool publica sozinho, sem nova confirmação.':'')}}
   if(t.id&&t.id.startsWith('x-')){const c=document.querySelector(`.xc[data-for="${t.id}"]`);if(c){const n=[...t.value].length;c.textContent=n;c.style.color=n>280?'var(--bad-fg)':''}}
   if(t.dataset.prevFor){clearTimeout(t._p);t._p=setTimeout(()=>renderPrev(t.dataset.prevFor),250)}
@@ -649,7 +807,7 @@ document.addEventListener('input',ev=>{const t=ev.target;
 function selectDia(d){
   dia=d;try{localStorage.setItem('pauta-dia',d)}catch(e){}
   if(unsubItens){unsubItens();unsubItens=null}itens=[];renderAll();
-  if(d==='identidade'||d==='semana'||!db)return;
+  if(d==='identidade'||d==='semana'||d==='nova'||!db)return;
   unsubItens=db.collection('itens').where('dia','==',d).onSnapshot(s=>{itens=s.docs.map(x=>({...x.data(),id:x.id}));renderSummary();renderList();
     if(irPara){const el=document.getElementById('item-'+irPara);if(el){el.scrollIntoView({behavior:'smooth',block:'start'});irPara=null}}},
     e=>{$('sumText').textContent='A conexão com a pauta caiu ('+(e&&e.code||'erro')+'). Recarregue a página.'});
@@ -658,7 +816,7 @@ renderAll();
 (async()=>{
   db=await claude.use('db');const user=await claude.use('user');
   claude.use('mcp').then(m=>{mcp=m;if(dia&&dia!=='semana'&&dia!=='identidade')renderList()}).catch(()=>{});
-  claude.use('sample').then(s=>{sampleFn=s;if(dia&&dia!=='semana'&&dia!=='identidade')renderList()}).catch(()=>{});
+  claude.use('sample').then(s=>{sampleFn=s;if(dia&&dia!=='semana'&&dia!=='identidade'){if(dia==='nova')lerNova();renderList()}}).catch(()=>{});
   if(!db){$('sumTitle').textContent='Central indisponível';$('sumText').textContent='Entre na sua conta Claude com acesso a esta página para ver e aprovar as publicações.';return}
   try{me=user?await user.id():null;const c=user?await user.can('data.write'):null;if(c===false)canWrite=false}catch(e){}
   assinarSemana();
@@ -667,7 +825,7 @@ renderAll();
     pautas=s.docs.map(x=>({...x.data(),id:x.id}));
     if(!dia){let saved=null;try{saved=localStorage.getItem('pauta-dia')}catch(e){}
       const firstDay=pautas.find(p=>/^\d/.test(p.id));
-      const pick=(saved==='identidade'||saved==='semana'||pautas.some(p=>p.id===saved))?saved:'semana';if(pick){selectDia(pick);return}}
+      const pick=(saved==='identidade'||saved==='semana'||saved==='nova'||pautas.some(p=>p.id===saved))?saved:'semana';if(pick){selectDia(pick);return}}
     renderDays();renderSummary();
   },e=>{$('sumText').textContent='Não foi possível carregar as pautas ('+(e&&e.code||'erro')+'). Recarregue a página.'});
 })();

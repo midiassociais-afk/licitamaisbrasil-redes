@@ -23,8 +23,9 @@ Formato das telas:
 - `{"tipo":"cta","titulo":"…","texto":"…","url":"licitamaisbrasil.com.br"}`, sempre a última de um carrossel
 
 ## Passo 2 — Refazer as artes (artePendente == true)
-Releia os itens com `artePendente == true` (inclui os do Passo 1). Para cada um:
+Releia os itens com `artePendente == true` (inclui os do Passo 1 e os posts novos criados na aba "Nova publicação" da Central, que têm `origem: "central"` e ainda não têm `imagens`). Para cada um:
 1. Tema = `linha` do item. Pasta atual = a parte de `imagens[0]` antes de `/01.png` (ex.: `reedicoes/01_PNCP_Atas_Contratos` ou `pautas/2026-10-26/2026-10-26-dica-x`). Nova pasta = pasta atual sem um sufixo `-aj<números>` que já exista, mais `-aj<AAAAMMDDHHmm>` (hora de Brasília). A pasta nova evita que navegadores e o Metricool mostrem a imagem antiga guardada em cache.
+   Se o item não tem `imagens` (post novo), a nova pasta é `pautas/<dia do item>/<doc_id>`, sem sufixo. Antes de renderizar, revise as `telas` de um post novo: confira os limites de caracteres e que nenhuma afirmação dependa de um fato não confirmado; o que estiver em `roteiro` ("Antes de publicar: …") fica para a equipe conferir, não altere.
 2. Monte /tmp/lmb/ajuste.json com `[{"id":"<doc_id>","tema":"<linha>","arquivo":"<nome da nova pasta, só o último trecho>","slides":<telas do item>}]` e renderize, com `<pai>` = a parte da pasta antes do último `/` (ex.: `reedicoes`):
    `mkdir -p /tmp/lmb && cd marca/render && npm ci --no-audit --no-fund && node render-carrossel.mjs /tmp/lmb/ajuste.json ../saida/<pai> && cd ../..`
    Se a saída disser "ATENÇÃO, ainda não cabe", encurte a tela, atualize `telas`/`slides` do item e renderize de novo.
